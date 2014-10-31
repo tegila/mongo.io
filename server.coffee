@@ -66,7 +66,7 @@ app.get '/:dbId/:colId', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
     col.find({}).toArray (err, items) ->
-      console.log items
+      #console.log items
       res.json items
 
 app.get '/:dbId/:colId/:id', (req, res) ->
@@ -74,15 +74,15 @@ app.get '/:dbId/:colId/:id', (req, res) ->
     col = db.collection req.param "colId"
     id = new ObjectID req.param("id")
     col.find({'_id': id}).toArray (err, items) ->
-      console.log items
+      #console.log items
       res.json items
 
 app.post '/:dbId/:colId/save', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
     col.save req.body, (err, result) ->
-      console.log result
-      res.json result
+      console.log result.ops
+      res.json result.ops
 
 app.post '/:dbId/:colId/remove', (req, res) ->
   console.log req.body._id

@@ -2,7 +2,7 @@
   "name": "noBackend",
   "version": "0.0.1",
   "description": ":)",
-  "repository": "git://tegila@AtomServer/workspace/nobackend",
+  "repository": "git://github.com/tegila/noBackend/",
   "main": "server.js",
   "scripts": {
     "test": "test"
@@ -11,7 +11,9 @@
   "license": "PRIVATE",
   "dependencies": {
     "body-parser": "~1.9.0",
+    "chai": "^1.9.2",
     "cheerio": "~0.17.0",
+    "curlrequest": "^0.5.1",
     "errorhandler": "~1.2.0",
     "express": "~4.9.5",
     "express-session": "~1.8.2",
@@ -20,10 +22,12 @@
     "morgan": "~1.4.0",
     "multer": "~0.1.4",
     "request": "~2.44.0",
+    "restler": "^3.2.2",
     "serve-favicon": "~2.1.5",
     "socket.io": "~1.1.0",
     "socket.io-client": "~1.1.0",
     "socket.io-events": "^0.4.3",
+    "supertest": "^0.14.0",
     "tweetnacl": "~0.12.2",
     "underscore": "~1.7.0"
   },
