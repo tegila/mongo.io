@@ -5,7 +5,7 @@
   "repository": "git://github.com/tegila/noBackend/",
   "main": "server.js",
   "scripts": {
-    "test": "test"
+    "test": "mocha --compilers coffee:coffee-script/register -R spec -s 100"
   },
   "author": "Edson Tégila Gonçalves",
   "license": "PRIVATE",

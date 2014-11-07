@@ -1,3 +1,4 @@
+###
 chai = require('chai')
 expect = chai.expect
 should = chai.should()
@@ -27,7 +28,7 @@ describe 'Rest API test', ->
       .expect(200)
       .end (error, result) ->
         should.not.exist error
-        console.log result
+        # console.log result
         expect(result.body).to.not.be.empty
         do done
 
@@ -42,4 +43,4 @@ describe 'Rest API test', ->
         should.not.exist error
         expect(result.body).to.not.be.empty
         do done
-
+###
