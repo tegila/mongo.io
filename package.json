@@ -10,11 +10,15 @@
   "author": "Edson Tégila Gonçalves",
   "license": "PRIVATE",
   "dependencies": {
+    "body-parser": "^1.9.2",
     "chai": "^1.9.2",
+    "errorhandler": "^1.2.2",
+    "express": "^4.10.2",
+    "express-session": "^1.9.1",
+    "method-override": "^2.3.0",
     "mongodb": "~2.0.3",
-    "socket.io": "~1.1.0",
-    "socket.io-client": "~1.1.0",
-    "socket.io-events": "^0.4.3",
+    "morgan": "^1.5.0",
+    "multer": "^0.1.6",
     "supertest": "^0.14.0",
     "tweetnacl": "~0.12.2",
     "underscore": "~1.7.0"

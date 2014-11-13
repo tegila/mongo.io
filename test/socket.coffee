@@ -10,7 +10,7 @@ describe 'Socket.io test', ->
 #    do done
 
   it 'Testa conexão com banco de dados', (done) ->
-    socket = Socket 'http://localhost:3000'
+    socket = Socket 'http://mongo.tegila.com.br:80'
     socket.on 'connect', ->
       do done
 
@@ -42,12 +42,12 @@ describe 'Socket.io test', ->
       socket.removeListener 'collection'
       do done
 
-#  it 'Remove um objeto da colleção', (done) ->
-#    socket.emit 'remove test collection', {obj: "param"}
-#    socket.on 'collection', (data) ->
-#      console.log data
-#      socket.removeListener 'collection'
-#      do done
+  it 'Remove um objeto da colleção', (done) ->
+    socket.emit 'remove test collection', {obj: "param"}
+    socket.on 'collection', (data) ->
+      console.log data
+      socket.removeListener 'collection'
+      do done
 
 #  it 'Testa desconexão', (done) ->
 #    do socket.disconnect
