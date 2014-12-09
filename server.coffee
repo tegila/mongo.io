@@ -14,7 +14,6 @@ multer = require("multer")
 errorHandler = require("errorhandler")
 
 # express http verb setup
-app.set "port", process.env.PORT or 3000
 app.use logger("dev")
 app.use methodOverride()
 app.use session(
@@ -54,11 +53,13 @@ MongoPool = (name) ->
 # @param {String} database - name of output database
 # @param {String} collection - where to put your values
 # @returns {Json} items - all the items inside the collection 
-app.get '/:dbId/:colId', (req, res) ->
+app.post '/:dbId/:colId', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
-    sample = req.param("sample") || {}
-    col.find(sample).toArray (err, items) ->
+    _sample = req.param("sample") || {}
+    _skip = req.param("skip") || 0
+    _limit = req.param("limit") || 10
+    col.find(_sample).skip(_skip).limit(_limit).toArray (err, items) ->
       console.log items
       res.json items
 
@@ -70,14 +71,16 @@ app.get '/:dbId/:colId/:id', (req, res) ->
       console.log items
       res.json items
 
-app.post '/:dbId/:colId/save', (req, res) ->
+app.post '/:dbId/:colId/:id', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
-    col.save req.body, (err, result) ->
-      console.log result.ops
-      res.json result.ops
+    col.find({'_id': req.params.id}).toArray (err, items) ->
+      console.log items
+      col.save req.body, {safe:true}, (err, result) ->
+        console.log result.ops
+        res.json result.ops
 
-app.post '/:dbId/:colId/remove', (req, res) ->
+app.del '/:dbId/:colId', (req, res) ->
   console.log req.body._id
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
