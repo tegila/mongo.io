@@ -13,6 +13,8 @@ bodyParser = require("body-parser")
 multer = require("multer")
 errorHandler = require("errorhandler")
 
+config = require './config'
+
 # express http verb setup
 app.use logger("dev")
 app.use methodOverride()
@@ -41,7 +43,7 @@ MongoPool = (name) ->
 
   @getConnection = (callback) ->
     return callback @connection if @connection
-    url = "mongodb://192.168.1.112:27017/#{name}"
+    url = "mongodb://#{config.mongo.url}:#{config.mongo.port}/#{name}"
     MongoClient.connect url, (err, db) ->
       callback @connection = db
 
@@ -53,13 +55,24 @@ MongoPool = (name) ->
 # @param {String} database - name of output database
 # @param {String} collection - where to put your values
 # @returns {Json} items - all the items inside the collection 
+app.get '/:dbId/:colId', (req, res) ->
+  MongoPool(req.param "dbId").getConnection (db) ->
+    col = db.collection req.param "colId"
+    _skip = parseInt(req.param("skip"), 10) || 0
+    _limit = parseInt(req.param("limit"), 10) || 10
+    col.find().sort({_id: -1}).skip(_skip).limit(_limit).toArray (err, items) ->
+      console.log items
+      res.json items
+
+# HTTP POST PAGINATE
 app.post '/:dbId/:colId', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
     _sample = req.param("sample") || {}
     _skip = parseInt(req.param("skip"), 10) || 0
     _limit = parseInt(req.param("limit"), 10) || 10
-    col.find(_sample).skip(_skip).limit(_limit).toArray (err, items) ->
+    _sort = req.param("limit") || { _id: -1 }
+    col.find(_sample).sort(_sort).skip(_skip).limit(_limit).toArray (err, items) ->
       console.log items
       res.json items
 
@@ -80,7 +93,7 @@ app.post '/:dbId/:colId/:id', (req, res) ->
         console.log result.ops
         res.json result.ops
 
-app.del '/:dbId/:colId', (req, res) ->
+app.delete '/:dbId/:colId', (req, res) ->
   console.log req.body._id
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
