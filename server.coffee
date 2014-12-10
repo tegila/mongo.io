@@ -57,8 +57,8 @@ app.post '/:dbId/:colId', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
     _sample = req.param("sample") || {}
-    _skip = req.param("skip") || 0
-    _limit = req.param("limit") || 10
+    _skip = parseInt(req.param("skip"), 10) || 0
+    _limit = parseInt(req.param("limit"), 10) || 10
     col.find(_sample).skip(_skip).limit(_limit).toArray (err, items) ->
       console.log items
       res.json items
