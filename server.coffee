@@ -1,8 +1,3 @@
-fs = require('fs')
-path = require 'path'
-util = require 'util'
-_ = require 'underscore'
-
 express = require 'express'
 app = do express
 
@@ -21,7 +16,7 @@ app.use methodOverride()
 app.use session(
   resave: true
   saveUninitialized: true
-  secret: "IAE/dha98123yja8"
+  secret: config.express.secret
 )
 app.use bodyParser.json()
 app.use bodyParser.urlencoded(extended: true)
@@ -55,6 +50,8 @@ MongoPool = (name) ->
 # @param {String} database - name of output database
 # @param {String} collection - where to put your values
 # @returns {Json} items - all the items inside the collection 
+
+# Get All
 app.get '/:dbId/:colId', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
@@ -64,7 +61,7 @@ app.get '/:dbId/:colId', (req, res) ->
       console.log items
       res.json items
 
-# HTTP POST PAGINATE
+# PAGINATE
 app.post '/:dbId/:colId', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
@@ -76,6 +73,7 @@ app.post '/:dbId/:colId', (req, res) ->
       console.log items
       res.json items
 
+# Get by ID
 app.get '/:dbId/:colId/:id', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
@@ -84,6 +82,7 @@ app.get '/:dbId/:colId/:id', (req, res) ->
       console.log items
       res.json items
 
+# SAVE
 app.post '/:dbId/:colId/:id', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
     col = db.collection req.param "colId"
@@ -93,6 +92,7 @@ app.post '/:dbId/:colId/:id', (req, res) ->
         console.log result.ops
         res.json result.ops
 
+# DELETE
 app.delete '/:dbId/:colId', (req, res) ->
   console.log req.body._id
   MongoPool(req.param "dbId").getConnection (db) ->
@@ -101,16 +101,13 @@ app.delete '/:dbId/:colId', (req, res) ->
       console.log results.ops
       res.json results.ops
 
-# all environments
-env = process.env.NODE_ENV || 'development'
-port = process.env.PORT || 3000
-host = process.env.HOST || null
+
 
 on_listen = ->
-  hostout = if host then host else '*'
-  console.log "Started at http://#{hostout}:#{port} [#{process.env.NODE_ENV}]"
+  hostout = if config.express.host then host else '*'
+  console.log "Started at http://#{hostout}:#{config.express.port} [#{config.express.env}]"
 
-if host
-  app.listen port, host, on_listen
+if config.express.host
+  app.listen config.express.port, host, on_listen
 else
-  app.listen port, on_listen
+  app.listen config.express.port, on_listen

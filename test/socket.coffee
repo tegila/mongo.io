@@ -3,6 +3,8 @@ expect = chai.expect
 should = chai.should()
 Socket = require('socket.io-client')
 
+config = require '../config'
+
 describe 'Socket.io test', ->
   socket = null
   
@@ -10,7 +12,7 @@ describe 'Socket.io test', ->
 #    do done
 
   it 'Testa conexão com banco de dados', (done) ->
-    socket = Socket 'http://mongo.tegila.com.br:80'
+    socket = Socket "http://#{config.express.host}:#{config.express.port}"
     socket.on 'connect', ->
       do done
 
