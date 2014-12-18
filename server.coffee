@@ -104,10 +104,10 @@ app.delete '/:dbId/:colId', (req, res) ->
 
 
 on_listen = ->
-  hostout = if config.express.host then host else '*'
+  hostout = if config.express.host then config.express.host else '*'
   console.log "Started at http://#{hostout}:#{config.express.port} [#{config.express.env}]"
 
 if config.express.host
-  app.listen config.express.port, host, on_listen
+  app.listen config.express.port, config.express.host, on_listen
 else
   app.listen config.express.port, on_listen
