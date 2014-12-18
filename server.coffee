@@ -68,7 +68,7 @@ app.post '/:dbId/:colId', (req, res) ->
     _sample = req.param("sample") || {}
     _skip = parseInt(req.param("skip"), 10) || 0
     _limit = parseInt(req.param("limit"), 10) || 10
-    _sort = req.param("limit") || { _id: -1 }
+    _sort = req.param("sort") || { _id: -1 }
     col.find(_sample).sort(_sort).skip(_skip).limit(_limit).toArray (err, items) ->
       console.log items
       res.json items
