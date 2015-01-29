@@ -61,6 +61,15 @@ app.get '/:dbId/:colId', (req, res) ->
       console.log items
       res.json items
 
+# Get by ID
+app.get '/:dbId/:colId/:id', (req, res) ->
+  MongoPool(req.param "dbId").getConnection (db) ->
+    col = db.collection req.param "colId"
+    id = new ObjectID req.param("id")
+    col.find({'_id': id}).toArray (err, items) ->
+      console.log items
+      res.json items
+
 # PAGINATE
 app.post '/:dbId/:colId', (req, res) ->
   MongoPool(req.param "dbId").getConnection (db) ->
@@ -70,15 +79,6 @@ app.post '/:dbId/:colId', (req, res) ->
     _limit = parseInt(req.param("limit"), 10) || 10
     _sort = req.param("sort") || { _id: -1 }
     col.find(_sample).sort(_sort).skip(_skip).limit(_limit).toArray (err, items) ->
-      console.log items
-      res.json items
-
-# Get by ID
-app.get '/:dbId/:colId/:id', (req, res) ->
-  MongoPool(req.param "dbId").getConnection (db) ->
-    col = db.collection req.param "colId"
-    id = new ObjectID req.param("id")
-    col.find({'_id': id}).toArray (err, items) ->
       console.log items
       res.json items
 
