@@ -27,10 +27,15 @@ app.use errorHandler
   showStack: true
 
 app.use (req, res, next) ->
-  for k, v of req.body
-    console.log k, v
-    if v.match /^(\d){4}-(\d){2}-(\d){2}T(\d){2}:(\d){2}:(\d){2}.(\d){3}Z$/i
-      req.body[k] = new Date Date.parse(v)
+  deepIterate = (obj) ->
+    for k, v of obj
+      console.log k, v
+      if v isnt null and typeof v is 'object'
+        deepIterate(v)
+      else if typeof v is 'string'
+        if v.match /^(\d){4}-(\d){2}-(\d){2}T(\d){2}:(\d){2}:(\d){2}.(\d){3}Z$/i
+          obj[k] = new Date Date.parse(v)
+  deepIterate req.body
   do next
 
 
