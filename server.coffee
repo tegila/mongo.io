@@ -52,9 +52,9 @@ MongoPool = (name) ->
 # @returns {Json} items - all the items inside the collection 
 
 # Get All
-app.get '/:dbId/:colId', (req, res) ->
-  MongoPool(req.param "dbId").getConnection (db) ->
-    col = db.collection req.param "colId"
+app.get '/:database/:collection', (req, res) ->
+  MongoPool(req.param "database").getConnection (db) ->
+    col = db.collection req.param "collection"
     _skip = parseInt(req.param("skip"), 10) || 0
     _limit = parseInt(req.param("limit"), 10) || 10
     col.find().sort({_id: -1}).skip(_skip).limit(_limit).toArray (err, items) ->
@@ -62,18 +62,18 @@ app.get '/:dbId/:colId', (req, res) ->
       res.json items
 
 # Get by ID
-app.get '/:dbId/:colId/:id', (req, res) ->
-  MongoPool(req.param "dbId").getConnection (db) ->
-    col = db.collection req.param "colId"
+app.get '/:database/:collection/:id', (req, res) ->
+  MongoPool(req.param "database").getConnection (db) ->
+    col = db.collection req.param "collection"
     id = new ObjectID req.param("id")
     col.find({'_id': id}).toArray (err, items) ->
       console.log items
       res.json items
 
 # PAGINATE
-app.post '/:dbId/:colId', (req, res) ->
-  MongoPool(req.param "dbId").getConnection (db) ->
-    col = db.collection req.param "colId"
+app.post '/:database/:collection', (req, res) ->
+  MongoPool(req.param "database").getConnection (db) ->
+    col = db.collection req.param "collection"
     _sample = req.param("sample") || {}
     _skip = parseInt(req.param("skip"), 10) || 0
     _limit = parseInt(req.param("limit"), 10) || 10
@@ -83,9 +83,9 @@ app.post '/:dbId/:colId', (req, res) ->
       res.json items
 
 # SAVE
-app.post '/:dbId/:colId/:id', (req, res) ->
-  MongoPool(req.param "dbId").getConnection (db) ->
-    col = db.collection req.param "colId"
+app.put '/:database/:collection/:id', (req, res) ->
+  MongoPool(req.param "database").getConnection (db) ->
+    col = db.collection req.param "collection"
     col.find({'_id': req.params.id}).toArray (err, items) ->
       console.log items
       col.save req.body, {safe:true}, (err, result) ->
@@ -93,15 +93,21 @@ app.post '/:dbId/:colId/:id', (req, res) ->
         res.json result.ops
 
 # DELETE
-app.delete '/:dbId/:colId', (req, res) ->
+app.delete '/:database/:collection', (req, res) ->
   console.log req.body._id
-  MongoPool(req.param "dbId").getConnection (db) ->
-    col = db.collection req.param "colId"
+  MongoPool(req.param "database").getConnection (db) ->
+    col = db.collection req.param "collection"
     col.remove req.body, (err, results) ->
       console.log results.ops
       res.json results.ops
 
-
+# AGGREGATE
+app.post '/:database/:collection/aggregate', (req, res) ->
+  console.log req.body
+  MongoPool(req.param "database").getConnection (db) ->
+    col = db.collection req.param "collection"
+    col.aggregate req.body, (err, items) ->
+      res.json items
 
 on_listen = ->
   hostout = if config.express.host then config.express.host else '*'
