@@ -1,32 +1,96 @@
+## Express.JS ##
 express = require 'express'
 app = do express
 
-logger = require("morgan")
+## Express.JS related ##
+morgan = require("morgan")
 methodOverride = require("method-override")
 session = require("express-session")
+MongoStore   = require('connect-mongo')(session)
+
 bodyParser = require("body-parser")
 multer = require("multer")
 errorHandler = require("errorhandler")
+cookieParser = require('cookie-parser')
 
-config = require './config'
+## passport ##
+passport = require('passport')
+util = require 'util'
+
+## Local includes ##
+config = require "./config"
+Routes = require "./Routes"
+MongoPool = require "./MongoPool.coffee"
+ObjectID = require('mongodb').ObjectID 
 
 # express http verb setup
-app.use logger("dev")
-app.use methodOverride()
-app.use session(
-  resave: true
-  saveUninitialized: true
-  secret: config.express.secret
-)
-app.use bodyParser.json()
-app.use bodyParser.urlencoded(extended: true)
-app.use multer()
 
+app.use do cookieParser # read cookies (needed for auth)
+app.use do methodOverride
+## express addons
+app.use do bodyParser.json
+app.use bodyParser.urlencoded(extended: true)
+app.use do multer
+
+## Debugger
+app.use morgan("dev")
 app.use errorHandler
   dumpExceptions: true
   showStack: true
 
-app.use (req, res, next) ->
+# required for passport
+app.use session 
+  saveUninitialized: false # don't create session until something stored
+  resave: false #don't save session if unmodified
+  store: new MongoStore
+    url: 'mongodb://192.168.1.112:27017/temp'
+  secret: config.express.secret # session secret
+  cookie: 
+    domain: ".tegila.com.br"
+    maxAge: 3600000
+
+## Passport <<START>>
+app.use do passport.initialize
+app.use do passport.session
+  
+passport.serializeUser (user, done) ->
+  done(null, user.id)
+
+passport.deserializeUser (id, done) ->
+  console.log "server.deserializeUser:57 ID: #{id}"
+  MongoPool("app").getConnection (db) ->
+    col = db.collection "users"
+    col.find({"_id": new ObjectID(id)}).limit(1).toArray (err, user) ->
+      console.log "server.deserializeUser:56 User: #{user}"
+      done(err, user)
+
+###
+ * [loggedIn is a function that check for user existence inside the database]
+ * @param  {[express.js req]}
+ * @param  {[express.js res]}
+ * @param  {Function callback}
+ * @return {Boolean}
+###
+isLoggedIn = (req, res, next) ->
+  console.log "routes.coffee:3 req.cookies = #{util.inspect(req.cookies, false, null)}" 
+  console.log "routes.isLoggedIn:L57 req.user: #{req.user}"
+  console.log "routes.isLoggedIn:L57 req.params: #{req.params}"
+  if req.isAuthenticated()
+    return next()
+
+  res.sendStatus(401) #unauthotized 
+app.use isLoggedIn
+## Passport <<END>>
+
+
+###
+ * [Parse Date: express bodyparse don't parse Date string, so we did! ]
+ * @param  {[express req]}
+ * @param  {[express res]}
+ * @param  {Function callback}
+ * @return {[Boolean]}
+###
+parseDate = (req, res, next) ->
   deepIterate = (obj) ->
     for k, v of obj
       console.log k, v
@@ -37,90 +101,10 @@ app.use (req, res, next) ->
           obj[k] = new Date Date.parse(v)
   deepIterate req.body
   do next
+app.use parseDate
 
-
-# Mongo Connection
-MongoClient = require('mongodb').MongoClient
-ObjectID = require('mongodb').ObjectID
-
-MongoPool = (name) ->
-  return MongoPool::[name] if MongoPool::[name]
-  MongoPool::[name] = this
-  
-  connection = null
-
-  @getConnection = (callback) ->
-    return callback @connection if @connection
-    url = "mongodb://#{config.mongo.url}:#{config.mongo.port}/#{name}"
-    MongoClient.connect url, (err, db) ->
-      callback @connection = db
-
-  return this
-
-# HTTP Verbs 
-#
-# Fetch the entire collection - <Like select * from ...>
-# @param {String} database - name of output database
-# @param {String} collection - where to put your values
-# @returns {Json} items - all the items inside the collection 
-
-# Get All
-app.get '/:database/:collection', (req, res) ->
-  MongoPool(req.param "database").getConnection (db) ->
-    col = db.collection req.param "collection"
-    _skip = parseInt(req.param("skip"), 10) || 0
-    _limit = parseInt(req.param("limit"), 10) || 10
-    col.find().sort({_id: -1}).skip(_skip).limit(_limit).toArray (err, items) ->
-      console.log items
-      res.json items
-
-# Get by ID
-app.get '/:database/:collection/:id', (req, res) ->
-  MongoPool(req.param "database").getConnection (db) ->
-    col = db.collection req.param "collection"
-    id = new ObjectID req.param("id")
-    col.find({'_id': id}).toArray (err, items) ->
-      console.log items
-      res.json items
-
-# PAGINATE
-app.post '/:database/:collection', (req, res) ->
-  MongoPool(req.param "database").getConnection (db) ->
-    col = db.collection req.param "collection"
-    _sample = req.param("sample") || {}
-    _skip = parseInt(req.param("skip"), 10) || 0
-    _limit = parseInt(req.param("limit"), 10) || 10
-    _sort = req.param("sort") || { _id: -1 }
-    col.find(_sample).sort(_sort).skip(_skip).limit(_limit).toArray (err, items) ->
-      console.log items
-      res.json items
-
-# SAVE
-app.put '/:database/:collection/:id', (req, res) ->
-  MongoPool(req.param "database").getConnection (db) ->
-    col = db.collection req.param "collection"
-    col.find({'_id': req.params.id}).toArray (err, items) ->
-      console.log items
-      col.save req.body, {safe:true}, (err, result) ->
-        console.log result.ops
-        res.json result.ops
-
-# DELETE
-app.delete '/:database/:collection', (req, res) ->
-  console.log req.body._id
-  MongoPool(req.param "database").getConnection (db) ->
-    col = db.collection req.param "collection"
-    col.remove req.body, (err, results) ->
-      console.log results.ops
-      res.json results.ops
-
-# AGGREGATE
-app.post '/:database/:collection/aggregate', (req, res) ->
-  console.log req.body
-  MongoPool(req.param "database").getConnection (db) ->
-    col = db.collection req.param "collection"
-    col.aggregate req.body, (err, items) ->
-      res.json items
+## -+> Start
+Routes app, passport
 
 on_listen = ->
   hostout = if config.express.host then config.express.host else '*'
