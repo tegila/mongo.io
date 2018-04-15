@@ -25,12 +25,29 @@ io.on('connect', function (socket) {
   console.log('Connected!');
 });
 
-io.on('session', function (socket) {
-  console.log(socket);  
+io.on('link', function (payload) {
+  console.log('link: ', payload);
+});
+
+io.on('session', function (payload) {
+  console.log('session: ', payload);
+  io.emit('link', {
+    action: "delete",
+    collection: "session",
+    sample: payload
+  });
 });
 
 io.emit('link', {
   action: "save",
+  collection: "session",
+  sample: {
+    hello: 'world'
+  }
+});
+
+io.emit('link', {
+  action: "query",
   collection: "session",
   sample: {
     hello: 'world'

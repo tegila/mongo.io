@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb')
+const { MongoClient, ObjectID } = require('mongodb')
 var io = require('socket.io')();
 var tweetnacl = require('tweetnacl');
 
@@ -7,20 +7,36 @@ var dec = tweetnacl.util.decodeBase64;
 let db = null;
 
 const fn = {
-  'query': (collection, sample) => {
-    console.log(collection, sample);
+  'query': (collection, sample, callback) => {
+    // console.log(collection, sample);
+    if(sample._id) delete sample._id;
+    coll = db.collection(collection);
+    coll.find(sample).toArray((err, results) => {
+      // console.log("query: ", collection, sample);
+      console.log('query: ', err, results);
+      return err ? callback(err) : callback(results);
+    });
   },
-  'delete': (collection, sample) => {
-    console.log(collection, sample);
+  'delete': (collection, sample, callback) => {
+    // console.log(collection, sample);
+    if(sample._id) sample._id = new ObjectID(sample._id);
+
+    coll = db.collection(collection);
+    
+    coll.remove(sample, (err, numberOfRemovedDocs) => {
+      console.log("delete: ", collection, sample);
+      // console.log(numberOfRemovedDocs.result);
+      return err ? callback(err) : callback(numberOfRemovedDocs);
+    });
   },
   'save': (collection, sample, callback) => {
-    console.log(collection, sample);
+    // console.log(collection, sample);
 
     coll = db.collection(collection);
     coll.save(sample, (err, result) => {
-      console.log("save event", collection, sample);
-      console.log(result.ops);
-      return err ? callback(err) : callback(result.ops);
+      // console.log("save: ", collection, sample);
+      console.log('save', err, result.ops);
+      return err ? callback(err) : callback(result.ops.pop());
     });
   }
 }
@@ -29,11 +45,18 @@ io.on('connection', function(socket){
   console.log('new connection');
 
   socket.on('link', function (data) {
-    console.log(data);
+    // console.log(data);
     // AUTHORIZATION LOGIC GOES HERE +LATER+
     if (data.action) {
       fn[data.action](data.collection, data.sample, (result) => {
-        socket.emit(data.collection, result);
+        if (result && result.constructor === Array) {
+          result.forEach((item) => {
+            console.log(item);
+            socket.emit(data.collection, item);  
+          });
+        } else {
+          socket.emit('link', result);
+        }
       });
     }
   });
