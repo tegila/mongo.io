@@ -25,9 +25,14 @@ io.on('connect', function (socket) {
   console.log('Connected!');
 });
 
-io.on('hello', function (socket) {
-  console.log(socket);
-  io.emit('hello', 'helloback2');
+io.on('session', function (socket) {
+  console.log(socket);  
 });
 
-io.emit('hello', 'helloback');
+io.emit('link', {
+  action: "save",
+  collection: "session",
+  sample: {
+    hello: 'world'
+  }
+});
