@@ -18,7 +18,7 @@ var auth = {
 }
 const auth_enc = querystring.stringify(auth);
 
-var io = socket.connect("http://127.0.0.1:3000/", { reconnect: true, query: auth_enc });
+var io = socket.connect(`http://${process.argv[2]}/`, { reconnect: true, query: auth_enc });
 
 // Add a connect listener
 io.on('connect', function (socket) {
