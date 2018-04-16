@@ -1,11 +1,11 @@
 {
   "name": "mongo.io",
-  "version": "0.0.3",
-  "description": "minimalist backend/bridge between mongodb and socket.io",
+  "version": "0.0.7",
+  "description": "minimalist pub/sub socket.io persisted in mongodb",
   "repository": "git://github.com/tegila/mongo.io/",
-  "main": "socketfy.js",
+  "main": "server.js",
   "scripts": {
-    "test": ""
+    "test": "env KEY=http://localhost:3000 mocha test/*.js"
   },
   "author": "Edson Tégila Gonçalves",
   "license": "PRIVATE",

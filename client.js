@@ -5,51 +5,70 @@ var querystring = require('querystring');
 
 var enc = tweetnacl.util.encodeBase64;
 var dec = tweetnacl.util.decodeBase64;
+let io = null;
 
-const keypair = tweetnacl.sign.keyPair();
-const raw = new Date().toString();
-const message = dec(raw);
-const signature = tweetnacl.sign.detached(message, keypair.secretKey);
+const MongoIOClient = {
+  on: (collection, sample, callback) => {
+    io.on(collection, function (payload) {
+      callback(payload);
+    });
 
-var auth = {
-  signature: enc(signature),
-  pubkey: enc(keypair.publicKey),
-  nonce: raw
+    io.emit('link', {
+      action: "query",
+      collection,
+      sample
+    });
+  },
+  once: (collection, sample, callback) => {
+    io.once(collection, function (payload) {
+      callback(payload);
+    });
+
+    io.emit('link', {
+      action: "query",
+      collection,
+      sample
+    });
+  },
+  delete: (collection, sample, callback) => {
+    io.emit('link', {
+      action: "delete",
+      collection,
+      sample
+    });
+  },
+  save: (collection, sample, callback) => {
+    io.emit('link', {
+      action: "save",
+      collection,
+      sample
+    });
+  }
 }
-const auth_enc = querystring.stringify(auth);
 
-var io = socket.connect(`http://${process.argv[2]}/`, { reconnect: true, query: auth_enc });
+module.exports = (url, old_keypair) => {
+  const keypair = old_keypair || tweetnacl.sign.keyPair();
+  const raw = new Date().toString();
+  const message = dec(raw);
+  const signature = tweetnacl.sign.detached(message, keypair.secretKey);
+  
+  const auth = {
+    signature: enc(signature),
+    pubkey: enc(keypair.publicKey),
+    nonce: raw
+  }
+  const auth_enc = querystring.stringify(auth);
+  
+  io = socket.connect(url, { reconnect: true, query: auth_enc });
 
-// Add a connect listener
-io.on('connect', function (socket) {
-  console.log('Connected!');
-});
-
-io.on('link', function (payload) {
-  console.log('link: ', payload);
-});
-
-io.on('session', function (payload) {
-  console.log('session: ', payload);
-  io.emit('link', {
-    action: "delete",
-    collection: "session",
-    sample: payload
+  // Add a connect listener
+  io.on('connect', function (socket) {
+    console.log('Connected!');
   });
-});
 
-io.emit('link', {
-  action: "save",
-  collection: "session",
-  sample: {
-    hello: 'world'
-  }
-});
+  io.on('link', function (payload) {
+    console.log('link: ', payload);
+  });
 
-io.emit('link', {
-  action: "query",
-  collection: "session",
-  sample: {
-    hello: 'world'
-  }
-});
+  return MongoIOClient;
+}
