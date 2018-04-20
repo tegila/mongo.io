@@ -17,29 +17,30 @@ const fn = {
     coll.find(sample).toArray((err, results) => {
       // console.log("query: ", collection, sample);
       console.log('query: ', err, results);
-      return err ? callback(err) : callback(results);
+      return err ? callback(err) : callback('query', results);
     });
   },
   'delete': (collection, sample, callback) => {
     // console.log(collection, sample);
     if(sample._id) sample._id = new ObjectID(sample._id);
-
+    delete sample._id;
     coll = db.collection(collection);
     
-    coll.remove(sample, (err, numberOfRemovedDocs) => {
+    coll.remove({hello: "world2"}, (err, result) => {
       console.log("delete: ", collection, sample);
       // console.log(numberOfRemovedDocs.result);
-      return err ? callback(err) : callback(numberOfRemovedDocs);
+      return err ? callback(err) : callback('delete', result);
     });
   },
   'save': (collection, sample, callback) => {
     // console.log(collection, sample);
+    if(sample._id) sample._id = new ObjectID(sample._id);
 
     coll = db.collection(collection);
     coll.save(sample, (err, result) => {
       // console.log("save: ", collection, sample);
       console.log('save', err, result.ops);
-      return err ? callback(err) : callback(result.ops.pop());
+      return err ? callback(err) : callback('save', result.ops);
     });
   }
 }
@@ -51,14 +52,23 @@ io.on('connection', function(socket){
     // console.log(data);
     // AUTHORIZATION LOGIC GOES HERE +LATER+
     if (data.action) {
-      fn[data.action](data.collection, data.sample, (result) => {
+      fn[data.action](data.collection, data.sample, (action, result) => {
         if (result && result.constructor === Array) {
           result.forEach((item) => {
-            console.log(item);
-            socket.emit(data.collection, item);  
+            console.log(`emit[array]:`, data.collection, item);
+            socket.emit(data.collection, {
+              action: data.action,
+              collection: data.collection,
+              item
+            });
           });
         } else {
-          socket.emit('link', result);
+          console.log(`emit[object]: ${result}`);
+          socket.emit(data.collection, {
+            action: data.action,
+            collection: data.collection,
+            item: result
+          });
         }
       });
     }
@@ -70,7 +80,7 @@ io.use((socket, next) => {
   const q = socket.handshake.query;
   const message = dec(q.nonce);
   const result = tweetnacl.sign.detached.verify(message, dec(q.signature), dec(q.pubkey));
-  
+  console.log(result);
   // return the result of next() to accept the connection.
   if (result) {
       return next();
@@ -81,9 +91,11 @@ io.use((socket, next) => {
   next(err);
 });
 
-url = "mongodb://127.0.0.1:27017/test"
+url = `mongodb://127.0.0.1:27017/${db_name}`
 MongoClient.connect(url, (err, connection) => {
+  console.log("MongoDB Connected");
   if(!connection) process.exit();
   db = connection.db(db_name);
   io.listen(port);
+  console.log(`listening socket.io on port ${port}`);
 });
