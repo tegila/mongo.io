@@ -1,6 +1,17 @@
 const { MongoClient, ObjectID } = require('mongodb')
-var io = require('socket.io')();
+var io = require('socket.io');
 var tweetnacl = require('tweetnacl');
+
+var fs = require('fs');
+var https = require('https');
+
+var options = {
+  key: fs.readFileSync('./cert.pem'),
+  cert: fs.readFileSync('./cert.crt')
+};
+
+var server = https.createServer(options);
+var io = io(server);
 
 var dec = tweetnacl.util.decodeBase64;
 
@@ -76,6 +87,7 @@ io.on('connection', function(socket){
 });
 
 io.use((socket, next) => {
+  console.log("io.use");
   // AUTHENTICATION LOGIC
   const q = socket.handshake.query;
   const message = dec(q.nonce);
@@ -96,6 +108,6 @@ MongoClient.connect(url, (err, connection) => {
   console.log("MongoDB Connected");
   if(!connection) process.exit();
   db = connection.db(db_name);
-  io.listen(port);
+  server.listen(port);
   console.log(`listening socket.io on port ${port}`);
 });

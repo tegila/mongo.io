@@ -12,7 +12,9 @@
   "dependencies": {
     "connect-mongo": "*",
     "socket.io": "^2.1.0",
-    "tweetnacl": "^0.13.1",
-    "underscore": "^1.8.3"
+    "tweetnacl": "^0.13.1"
+  },
+  "devDependencies": {
+    "chai": "*"
   }
 }

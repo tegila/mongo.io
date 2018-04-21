@@ -19,8 +19,8 @@ module.exports = (url, old_keypair) => {
     nonce: raw
   }
   const auth_enc = querystring.stringify(auth);
-  
-  io = socket.connect(url, { reconnect: true, query: auth_enc });
+
+  io = socket.connect(url, { rejectUnauthorized: false, reconnect: true, query: auth_enc });
 
   return {
     on: (topic, callback) => {
