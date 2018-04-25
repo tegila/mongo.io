@@ -21,39 +21,56 @@ const db_name = process.argv[2] || 'test';
 const port = process.argv[3] || 3000;
 
 const fn = {
-  'query': (collection, sample, callback) => {
-    // console.log(collection, sample);
-    if(sample._id) delete sample._id;
-    coll = db.collection(collection);
-    coll.find(sample).toArray((err, results) => {
-      // console.log("query: ", collection, sample);
+  'query': (db_name, collection, payload, callback) => {
+    // console.log(collection, payload);
+    if(payload._id) delete payload._id;
+    let _db = db.db(db_name);
+    const coll = _db.collection(collection);
+    coll.find(payload).toArray((err, results) => {
+      // console.log("query: ", collection, payload);
       console.log('query: ', err, results);
       return err ? callback(err) : callback('query', results);
     });
   },
-  'delete': (collection, sample, callback) => {
-    // console.log(collection, sample);
-    if(sample._id) sample._id = new ObjectID(sample._id);
-    delete sample._id;
-    coll = db.collection(collection);
+  'delete': (db_name, collection, payload, callback) => {
+    // console.log(collection, payload);
+    if(payload._id) payload._id = new ObjectID(payload._id);
+
+    console.log("payload: ", payload);
+    let _db = db.db(db_name);
+    const coll = _db.collection(collection);
     
-    coll.remove({hello: "world2"}, (err, result) => {
-      console.log("delete: ", collection, sample);
+    coll.remove(payload, (err, result) => {
+      console.log("delete: ", collection, payload);
       // console.log(numberOfRemovedDocs.result);
       return err ? callback(err) : callback('delete', result);
     });
   },
-  'save': (collection, sample, callback) => {
-    // console.log(collection, sample);
-    if(sample._id) sample._id = new ObjectID(sample._id);
+  'save': (db_name, collection, payload, callback) => {
+    // console.log(collection, payload);
+    if(payload._id) payload._id = new ObjectID(payload._id);
 
-    coll = db.collection(collection);
-    coll.save(sample, (err, result) => {
-      // console.log("save: ", collection, sample);
+    let _db = db.db(db_name);
+    const coll = _db.collection(collection);
+    coll.save(payload, (err, result) => {
+      // console.log("save: ", collection, payload);
       console.log('save', err, result.ops);
       return err ? callback(err) : callback('save', result.ops);
     });
-  }
+  },
+  'update': (db_name, collection, payload, callback) => {
+    // console.log(collection, payload);
+    if(payload._id) payload._id = new ObjectID(payload._id);
+
+    let _db = db.db(db_name);
+    const coll = _db.collection(collection);
+    coll.update(payload.target, { '$set': payload.data }, payload.ops, function(err, res) {
+      // console.log("save: ", collection, payload);
+      console.log('update', err, res.result);
+      return err ? callback(err) : callback('update', res.result);
+    });
+  },
+
 }
 
 io.on('connection', function(socket){
@@ -63,14 +80,15 @@ io.on('connection', function(socket){
     // console.log(data);
     // AUTHORIZATION LOGIC GOES HERE +LATER+
     if (data.action) {
-      fn[data.action](data.collection, data.sample, (action, result) => {
+      const [db_name, collection] = data.collection.split("/");
+      fn[data.action](db_name, collection, data.payload, (action, result) => {
         if (result && result.constructor === Array) {
-          result.forEach((item) => {
-            console.log(`emit[array]:`, data.collection, item);
+          result.forEach((payload) => {
+            console.log(`emit[array]:`, data.collection, payload);
             socket.emit(data.collection, {
               action: data.action,
               collection: data.collection,
-              item
+              payload
             });
           });
         } else {
@@ -78,7 +96,7 @@ io.on('connection', function(socket){
           socket.emit(data.collection, {
             action: data.action,
             collection: data.collection,
-            item: result
+            payload: result
           });
         }
       });
@@ -103,7 +121,7 @@ io.use((socket, next) => {
   next(err);
 });
 
-url = `mongodb://127.0.0.1:27017/${db_name}`
+const url = `mongodb://127.0.0.1:27017/${db_name}`
 MongoClient.connect(url, (err, connection) => {
   console.log("MongoDB Connected");
   if(!connection) process.exit();

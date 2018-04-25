@@ -29,26 +29,34 @@ module.exports = (url, old_keypair) => {
     once: (topic, callback) => {
       io.once(topic, callback);
     },
-    query: (collection, sample, callback) => {
+    query: (collection, payload, callback) => {
       io.emit('link', {
         action: "query",
         collection,
-        sample
+        payload
       });
     },
-    delete: (collection, sample, callback) => {
+    delete: (collection, payload, callback) => {
       io.emit('link', {
         action: "delete",
         collection,
-        sample
+        payload
       });
     },
-    save: (collection, sample, callback) => {
+    save: (collection, payload, callback) => {
       // payload_hash = nacl.hash(JSON.stringify(payload));
       io.emit('link', {
         action: "save",
         collection,
-        sample
+        payload
+      });
+    },
+    update: (collection, payload, callback) => {
+      // payload_hash = nacl.hash(JSON.stringify(payload));
+      io.emit('link', {
+        action: "update",
+        collection,
+        payload
       });
     }
   }
