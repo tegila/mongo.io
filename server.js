@@ -6,8 +6,8 @@ var fs = require('fs');
 var https = require('https');
 
 var options = {
-  key: fs.readFileSync('./cert.pem'),
-  cert: fs.readFileSync('./cert.crt')
+  key: fs.readFileSync(path.resolve(__dirname, 'cert.pem')),
+  cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt'))
 };
 
 var server = https.createServer(options);
@@ -70,7 +70,6 @@ const fn = {
       return err ? callback(err) : callback('update', res.result);
     });
   },
-
 }
 
 io.on('connection', function(socket){
