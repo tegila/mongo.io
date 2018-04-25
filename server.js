@@ -3,6 +3,7 @@ var io = require('socket.io');
 var tweetnacl = require('tweetnacl');
 
 var fs = require('fs');
+var path = require('path');
 var https = require('https');
 
 var options = {
