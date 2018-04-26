@@ -1,26 +1,35 @@
-//client.js
-var socket = require('socket.io-client');
-var nacl = require('tweetnacl');
+const socket = require('socket.io-client');
+const nacl = require('tweetnacl');
+const Buffer = require('Buffer');
+const querystring = require('querystring');
 
-var querystring = require('querystring');
-
-var enc = nacl.util.encodeBase64;
-var dec = nacl.util.decodeBase64;
+const enc = nacl.util.encodeBase64;
+const dec = nacl.util.decodeBase64;
 let io = null;
 
 module.exports = (url, old_keypair) => {
-  const keypair = old_keypair || nacl.sign.keyPair();
-  let message = new Date().toString();
+  let keypair = {};
+  if (old_keypair) {
+    keypair.secretKey = dec(old_keypair.secretKey);
+    keypair.publicKey = dec(old_keypair.publicKey);
+  } else {
+    keypair = nacl.sign.keyPair();
+  }
+  console.log(Buffer);
+  console.log(enc(keypair.publicKey));
+  console.log(enc(keypair.secretKey));
+  const message = new Date().toString();
 
-  const signature = nacl.sign.detached(dec(message), keypair.secretKey);
-  
+  const signature = nacl.sign.detached(Buffer.from(message), keypair.secretKey);
+
   const auth = {
     signature: enc(signature),
     pubkey: enc(keypair.publicKey),
-    message: message
-  }
+    message
+  };
   const auth_enc = querystring.stringify(auth);
 
+  // https://localhost/socket.io?query={signature=...&pubkey=...&message=...}
   io = socket.connect(url, { rejectUnauthorized: false, reconnect: true, query: auth_enc });
 
   return {
@@ -30,8 +39,8 @@ module.exports = (url, old_keypair) => {
     once: (topic, callback) => {
       io.once(topic, callback);
     },
-    query: (collection, payload, callback) => {
-      payload_hash = nacl.hash(dec(JSON.stringify(payload)));
+    query: (collection, payload) => {
+      const payload_hash = nacl.hash(Buffer.from(JSON.stringify(payload)));
       const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "query",
@@ -40,8 +49,8 @@ module.exports = (url, old_keypair) => {
         signature
       });
     },
-    delete: (collection, payload, callback) => {
-      payload_hash = nacl.hash(dec(JSON.stringify(payload)));
+    delete: (collection, payload) => {
+      const payload_hash = nacl.hash(Buffer.from(JSON.stringify(payload)));
       const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "delete",
@@ -50,8 +59,8 @@ module.exports = (url, old_keypair) => {
         signature
       });
     },
-    save: (collection, payload, callback) => {
-      payload_hash = nacl.hash(dec(JSON.stringify(payload)));
+    save: (collection, payload) => {
+      const payload_hash = nacl.hash(Buffer.from(JSON.stringify(payload)));
       const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "save",
@@ -60,8 +69,8 @@ module.exports = (url, old_keypair) => {
         signature
       });
     },
-    update: (collection, payload, callback) => {
-      payload_hash = nacl.hash(dec(JSON.stringify(payload)));
+    update: (collection, payload) => {
+      const payload_hash = nacl.hash(Buffer.from(JSON.stringify(payload)));
       const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "update",
@@ -70,5 +79,5 @@ module.exports = (url, old_keypair) => {
         signature
       });
     }
-  }
-}
+  };
+};

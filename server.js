@@ -1,20 +1,20 @@
 const { MongoClient, ObjectID } = require('mongodb')
-var io = require('socket.io');
-var nacl = require('tweetnacl');
+const socketio = require('socket.io');
+const nacl = require('tweetnacl');
 
-var fs = require('fs');
-var path = require('path');
-var https = require('https');
+const fs = require('fs');
+const path = require('path');
+const https = require('https');
 
-var options = {
+const options = {
   key: fs.readFileSync(path.resolve(__dirname, 'cert.pem')),
   cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt'))
 };
 
-var server = https.createServer(options);
-var io = io(server);
+const server = https.createServer(options);
+const io = socketio(server);
 
-var dec = nacl.util.decodeBase64;
+const dec = nacl.util.decodeBase64;
 
 let db = null;
 
@@ -78,38 +78,50 @@ io.on('connection', function(socket, next){
   const q = socket.handshake.query;
   console.log(q);
   socket.on('link', function (data) {
+    const [db_name, collection] = data.collection.split("/");
     // console.log(data);
     // AUTHORIZATION LOGIC GOES HERE +LATER+
-    console.log(data);
-    const payload_hash = nacl.hash(dec(JSON.stringify(data.payload)));
+    const payload_hash = nacl.hash(Buffer.from(JSON.stringify(data.payload)));
     const _match = nacl.sign.detached.verify(payload_hash, dec(data.signature), dec(q.pubkey));
-    if(!_match) {
-      const err = new Error('Authentication error');
-      return err;
+
+    const _validate = socket.__auth__.restrictions.some((item) => {
+      if(!data.action) return false;
+      // caso encontre o caminho no perfil do usuario
+      if(item.path.localeCompare(data.collection)) {
+        // confere agora se tem permissão de leitura e/ou escrita
+        if(data.action === 'query') {
+          return (item.permission.indexOf('r') !== -1);
+        } else {
+          return (item.permission.indexOf('w') !== -1);
+        }
+      }
+    });
+    
+    if(!_validate) {
+      throw new Error('Authorization error');
     }
 
-    if (data.action) {
-      const [db_name, collection] = data.collection.split("/");
-      fn[data.action](db_name, collection, data.payload, (action, result) => {
-        if (result && result.constructor === Array) {
-          result.forEach((payload) => {
-            console.log(`emit[array]:`, data.collection, payload);
-            socket.emit(data.collection, {
-              action: data.action,
-              collection: data.collection,
-              payload
-            });
-          });
-        } else {
-          console.log(`emit[object]: ${result}`);
+    /* -- END AUTH -- */
+
+    fn[data.action](db_name, collection, data.payload, (action, result) => {
+      if (result && result.constructor === Array) {
+        result.forEach((payload) => {
+          console.log(`emit[array]:`, data.collection, payload);
           socket.emit(data.collection, {
             action: data.action,
             collection: data.collection,
-            payload: result
+            payload
           });
-        }
-      });
-    }
+        });
+      } else {
+        console.log(`emit[object]: ${result}`);
+        socket.emit(data.collection, {
+          action: data.action,
+          collection: data.collection,
+          payload: result
+        });
+      }
+    });
   });
 });
 
@@ -119,34 +131,30 @@ io.use((socket, next) => {
   const q = socket.handshake.query;
 
   const message = q.message;
-  const result = nacl.sign.detached.verify(dec(message), dec(q.signature), dec(q.pubkey));
+  const result = nacl.sign.detached.verify(Buffer.from(message), dec(q.signature), dec(q.pubkey));
   console.log(result);
   // return the result of next() to accept the connection.
   
-  /*
   let _db = db.db("__auth__");
   const coll = _db.collection("Profiles");
-  coll.find({pubkey: q.pubkey}).toArray((err, results) => {
-    // console.log("query: ", collection, payload);
-    console.log('query: ', err, results);
-    return err ? callback(err) : callback('query', results);
-  });
-  */
-
-  if (result) {
+  coll.findOne({pubkeys: q.pubkey}, (err, profile) => {
+    if (profile) {
+      console.log('query: ', err, profile);
+      socket.__auth__ = profile;
       return next();
-  }
-
-  const err = new Error('Authentication error');
-  console.log(err)
-  // call next() with an Error if you need to reject the connection.
-  next(err);
+    }
+    
+    err = new Error('Authentication error');
+    console.log(err)
+    // call next() with an Error if you need to reject the connection.
+    next(err);
+  });
 });
 
 const url = `mongodb://127.0.0.1:27017/${db_name}`
 MongoClient.connect(url, (err, connection) => {
-  console.log("MongoDB Connected");
   if(!connection) process.exit();
+  console.log("MongoDB Connected");
   db = connection.db(db_name);
   server.listen(port);
   console.log(`listening socket.io on port ${port}`);

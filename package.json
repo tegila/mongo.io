@@ -10,6 +10,7 @@
   "author": "Edson Tégila Gonçalves",
   "license": "PRIVATE",
   "dependencies": {
+    "Buffer": "^0.0.0",
     "connect-mongo": "*",
     "socket.io": "^2.1.0",
     "tweetnacl": "0.13.1"
