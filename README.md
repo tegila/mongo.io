@@ -2,7 +2,7 @@
 # redux-store-mongodb
 ## Redux Store Persistence Layer using mongodb
 
-### tweetnacl + socketio + mongoclient 
+### nacl + socketio + mongoclient 
 
 
 # Installing 

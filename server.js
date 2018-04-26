@@ -1,6 +1,6 @@
 const { MongoClient, ObjectID } = require('mongodb')
 var io = require('socket.io');
-var tweetnacl = require('tweetnacl');
+var nacl = require('tweetnacl');
 
 var fs = require('fs');
 var path = require('path');
@@ -14,7 +14,7 @@ var options = {
 var server = https.createServer(options);
 var io = io(server);
 
-var dec = tweetnacl.util.decodeBase64;
+var dec = nacl.util.decodeBase64;
 
 let db = null;
 
@@ -73,12 +73,21 @@ const fn = {
   },
 }
 
-io.on('connection', function(socket){
+io.on('connection', function(socket, next){
   console.log('new connection');
-
+  const q = socket.handshake.query;
+  console.log(q);
   socket.on('link', function (data) {
     // console.log(data);
     // AUTHORIZATION LOGIC GOES HERE +LATER+
+    console.log(data);
+    const payload_hash = nacl.hash(dec(JSON.stringify(data.payload)));
+    const _match = nacl.sign.detached.verify(payload_hash, dec(data.signature), dec(q.pubkey));
+    if(!_match) {
+      const err = new Error('Authentication error');
+      return err;
+    }
+
     if (data.action) {
       const [db_name, collection] = data.collection.split("/");
       fn[data.action](db_name, collection, data.payload, (action, result) => {
@@ -105,16 +114,29 @@ io.on('connection', function(socket){
 });
 
 io.use((socket, next) => {
-  console.log("io.use");
+  console.log("---- io.use ----");
   // AUTHENTICATION LOGIC
   const q = socket.handshake.query;
-  const message = dec(q.nonce);
-  const result = tweetnacl.sign.detached.verify(message, dec(q.signature), dec(q.pubkey));
+
+  const message = q.message;
+  const result = nacl.sign.detached.verify(dec(message), dec(q.signature), dec(q.pubkey));
   console.log(result);
   // return the result of next() to accept the connection.
+  
+  /*
+  let _db = db.db("__auth__");
+  const coll = _db.collection("Profiles");
+  coll.find({pubkey: q.pubkey}).toArray((err, results) => {
+    // console.log("query: ", collection, payload);
+    console.log('query: ', err, results);
+    return err ? callback(err) : callback('query', results);
+  });
+  */
+
   if (result) {
       return next();
   }
+
   const err = new Error('Authentication error');
   console.log(err)
   // call next() with an Error if you need to reject the connection.

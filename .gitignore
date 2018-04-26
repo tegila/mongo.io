@@ -52,6 +52,6 @@ Thumbs.db
 .settings
 
 yarn.lock
-cert*
+#cert*
 
 yarn*

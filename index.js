@@ -1,22 +1,23 @@
 //client.js
 var socket = require('socket.io-client');
-var tweetnacl = require('tweetnacl');
+var nacl = require('tweetnacl');
+
 var querystring = require('querystring');
 
-var enc = tweetnacl.util.encodeBase64;
-var dec = tweetnacl.util.decodeBase64;
+var enc = nacl.util.encodeBase64;
+var dec = nacl.util.decodeBase64;
 let io = null;
 
 module.exports = (url, old_keypair) => {
-  const keypair = old_keypair || tweetnacl.sign.keyPair();
-  const raw = new Date().toString();
-  const message = dec(raw);
-  const signature = tweetnacl.sign.detached(message, keypair.secretKey);
+  const keypair = old_keypair || nacl.sign.keyPair();
+  let message = new Date().toString();
+
+  const signature = nacl.sign.detached(dec(message), keypair.secretKey);
   
   const auth = {
     signature: enc(signature),
     pubkey: enc(keypair.publicKey),
-    nonce: raw
+    message: message
   }
   const auth_enc = querystring.stringify(auth);
 
@@ -30,33 +31,43 @@ module.exports = (url, old_keypair) => {
       io.once(topic, callback);
     },
     query: (collection, payload, callback) => {
+      payload_hash = nacl.hash(dec(JSON.stringify(payload)));
+      const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "query",
         collection,
-        payload
+        payload,
+        signature
       });
     },
     delete: (collection, payload, callback) => {
+      payload_hash = nacl.hash(dec(JSON.stringify(payload)));
+      const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "delete",
         collection,
-        payload
+        payload,
+        signature
       });
     },
     save: (collection, payload, callback) => {
-      // payload_hash = nacl.hash(JSON.stringify(payload));
+      payload_hash = nacl.hash(dec(JSON.stringify(payload)));
+      const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "save",
         collection,
-        payload
+        payload,
+        signature
       });
     },
     update: (collection, payload, callback) => {
-      // payload_hash = nacl.hash(JSON.stringify(payload));
+      payload_hash = nacl.hash(dec(JSON.stringify(payload)));
+      const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "update",
         collection,
-        payload
+        payload,
+        signature
       });
     }
   }
