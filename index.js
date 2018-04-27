@@ -1,6 +1,6 @@
 const socket = require('socket.io-client');
 const nacl = require('tweetnacl');
-const Buffer = require('Buffer');
+const _buffer = require('Buffer');
 const querystring = require('querystring');
 
 const enc = nacl.util.encodeBase64;
@@ -15,12 +15,12 @@ module.exports = (url, old_keypair) => {
   } else {
     keypair = nacl.sign.keyPair();
   }
-  console.log(Buffer);
+  console.log(_buffer);
   console.log(enc(keypair.publicKey));
   console.log(enc(keypair.secretKey));
   const message = new Date().toString();
 
-  const signature = nacl.sign.detached(Buffer.from(message), keypair.secretKey);
+  const signature = nacl.sign.detached(new Uint8Array(message), keypair.secretKey);
 
   const auth = {
     signature: enc(signature),
@@ -40,7 +40,7 @@ module.exports = (url, old_keypair) => {
       io.once(topic, callback);
     },
     query: (collection, payload) => {
-      const payload_hash = nacl.hash(Buffer.from(JSON.stringify(payload)));
+      const payload_hash = nacl.hash(new Uint8Array(JSON.stringify(payload)));
       const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "query",
@@ -50,7 +50,7 @@ module.exports = (url, old_keypair) => {
       });
     },
     delete: (collection, payload) => {
-      const payload_hash = nacl.hash(Buffer.from(JSON.stringify(payload)));
+      const payload_hash = nacl.hash(new Uint8Array(JSON.stringify(payload)));
       const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "delete",
@@ -60,7 +60,7 @@ module.exports = (url, old_keypair) => {
       });
     },
     save: (collection, payload) => {
-      const payload_hash = nacl.hash(Buffer.from(JSON.stringify(payload)));
+      const payload_hash = nacl.hash(new Uint8Array(JSON.stringify(payload)));
       const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "save",
@@ -70,7 +70,7 @@ module.exports = (url, old_keypair) => {
       });
     },
     update: (collection, payload) => {
-      const payload_hash = nacl.hash(Buffer.from(JSON.stringify(payload)));
+      const payload_hash = nacl.hash(new Uint8Array(JSON.stringify(payload)));
       const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "update",
