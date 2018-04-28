@@ -132,8 +132,8 @@ io.use((socket, next) => {
   const q = socket.handshake.query;
 
   const message = q.message;
-  const result = nacl.sign.detached.verify(new Uint8Array(message), dec(q.signature), dec(q.pubkey));
-  console.log(result);
+  const signature_is_valid = nacl.sign.detached.verify(new Uint8Array(message), dec(q.signature), dec(q.pubkey));
+  console.log(signature_is_valid);
   // return the result of next() to accept the connection.
   
   let _db = db.db("__auth__");
@@ -143,12 +143,15 @@ io.use((socket, next) => {
       console.log('query: ', err, profile);
       socket.__auth__ = profile;
       return next();
+    } else if (signature_is_valid) {
+      const err = new Error('Signature is valid but can\'t find the user');
+      console.log(err)
+      next(err);
+    } else {
+      const err = new Error('Authentication error');
+      console.log(err)
+      next(err);
     }
-    
-    err = new Error('Authentication error');
-    console.log(err)
-    // call next() with an Error if you need to reject the connection.
-    next(err);
   });
 });
 
