@@ -62,6 +62,7 @@ module.exports = (url, old_keypair) => {
     save: (collection, payload) => {
       const payload_hash = nacl.hash(new Uint8Array(JSON.stringify(payload)));
       const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
+      console.log('save mongo', collection, payload, payload_hash, signature);
       io.emit('link', {
         action: "save",
         collection,

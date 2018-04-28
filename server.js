@@ -55,6 +55,7 @@ const fn = {
     const coll = _db.collection(collection);
     coll.save(payload, (err, result) => {
       // console.log("save: ", collection, payload);
+      console.log(result);
       console.log('save', err, result.ops);
       return err ? callback(err) : callback('save', result.ops);
     });
@@ -62,12 +63,12 @@ const fn = {
   'update': (db_name, collection, payload, callback) => {
     // console.log(collection, payload);
     if(payload._id) payload._id = new ObjectID(payload._id);
-
+    console.log(payload);
     let _db = db.db(db_name);
     const coll = _db.collection(collection);
     coll.update(payload.target, { '$set': payload.data }, payload.ops, function(err, res) {
       // console.log("save: ", collection, payload);
-      console.log('update', err, res.result);
+      console.log('update', err, res);
       return err ? callback(err) : callback('update', res.result);
     });
   },
@@ -107,7 +108,7 @@ io.on('connection', function(socket, next){
       if (result && result.constructor === Array) {
         result.forEach((payload) => {
           console.log(`emit[array]:`, data.collection, payload);
-          socket.emit(data.collection, {
+          io.emit(data.collection, {
             action: data.action,
             collection: data.collection,
             payload
@@ -115,7 +116,7 @@ io.on('connection', function(socket, next){
         });
       } else {
         console.log(`emit[object]: ${result}`);
-        socket.emit(data.collection, {
+        io.emit(data.collection, {
           action: data.action,
           collection: data.collection,
           payload: result
