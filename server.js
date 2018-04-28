@@ -132,7 +132,7 @@ io.use((socket, next) => {
   const q = socket.handshake.query;
 
   const message = q.message;
-  const result = nacl.sign.detached.verify(Buffer.from(message), dec(q.signature), dec(q.pubkey));
+  const result = nacl.sign.detached.verify(new Uint8Array(message), dec(q.signature), dec(q.pubkey));
   console.log(result);
   // return the result of next() to accept the connection.
   
