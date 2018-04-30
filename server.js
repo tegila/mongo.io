@@ -62,14 +62,17 @@ const fn = {
   },
   'update': (db_name, collection, payload, callback) => {
     // console.log(collection, payload);
-    if(payload._id) payload._id = new ObjectID(payload._id);
+    if(payload.target._id) payload.target._id = new ObjectID(payload.target._id);
+    if(payload.data._id) payload.data._id = new ObjectID(payload.data._id);
     console.log(payload);
     let _db = db.db(db_name);
     const coll = _db.collection(collection);
     coll.update(payload.target, { '$set': payload.data }, payload.ops, function(err, res) {
       // console.log("save: ", collection, payload);
-      console.log('update', err, res);
-      return err ? callback(err) : callback('update', res.result);
+      coll.findOne(payload.target, (err, res) => {
+        console.log('update', err, res);
+        return err ? callback(err) : callback('update', res);
+      })
     });
   },
 }
