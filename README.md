@@ -22,3 +22,8 @@
 `node server.js --harmony --use_strict`
 
 [reference](https://medium.com/@dai_shi/tail-call-optimization-tco-in-node-v6-e2492c9d5b7c)
+
+
+# Testing 
+
+chrome://flags/#allow-insecure-localhost
