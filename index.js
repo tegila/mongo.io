@@ -1,11 +1,20 @@
 const socket = require('socket.io-client');
 const nacl = require('tweetnacl');
-const _buffer = require('Buffer');
 const querystring = require('querystring');
 
 const enc = nacl.util.encodeBase64;
 const dec = nacl.util.decodeBase64;
 let io = null;
+
+
+/* https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder  */
+function str2ab(str) {
+  var buf = new ArrayBuffer(str.length); // 2 bytes for each char
+  for (var i = 0; i < str.length; i++) {
+    buf[i] = str.charCodeAt(i);
+  }
+  return new Uint8Array(buf);
+}
 
 module.exports = (url, old_keypair) => {
   let keypair = {};
@@ -15,12 +24,10 @@ module.exports = (url, old_keypair) => {
   } else {
     keypair = nacl.sign.keyPair();
   }
-  console.log(_buffer);
-  console.log(enc(keypair.publicKey));
-  console.log(enc(keypair.secretKey));
+
   const message = new Date().toString();
 
-  const signature = nacl.sign.detached(new Uint8Array(message), keypair.secretKey);
+  const signature = nacl.sign.detached(str2ab(message), keypair.secretKey);
 
   const auth = {
     signature: enc(signature),
@@ -39,45 +46,67 @@ module.exports = (url, old_keypair) => {
     once: (topic, callback) => {
       io.once(topic, callback);
     },
-    query: (collection, payload) => {
-      const payload_hash = nacl.hash(new Uint8Array(JSON.stringify(payload)));
+    query: (path, payload) => {
+      const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
       const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
       io.emit('link', {
         action: "query",
-        collection,
+        path,
         payload,
         signature
       });
     },
-    delete: (collection, payload) => {
-      const payload_hash = nacl.hash(new Uint8Array(JSON.stringify(payload)));
-      const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
-      io.emit('link', {
-        action: "delete",
-        collection,
-        payload,
-        signature
+    delete: (path, payload) => {
+      return new Promise((resolve, reject) => {
+        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
+        const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
+        io.once(signature, (data) => {
+          console.log("[index.js] ONCE DELETE");
+          if (data.err) reject(data.err);
+          if (data.res) resolve(data.res);
+        });
+        io.emit('link', {
+          action: "delete",
+          path,
+          payload,
+          signature
+        });
       });
     },
-    save: (collection, payload) => {
-      const payload_hash = nacl.hash(new Uint8Array(JSON.stringify(payload)));
-      const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
-      console.log('save mongo', collection, payload, payload_hash, signature);
-      io.emit('link', {
-        action: "save",
-        collection,
-        payload,
-        signature
+    save: (path, payload) => {
+      return new Promise((resolve, reject) => {
+        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
+        const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
+        console.log('[index.js] save', path, payload, signature);
+        io.once(signature, (data) => {
+          console.log("[index.js] ONCE SAVE");
+          if (data.err) reject(data.err);
+          if (data.res) resolve(data.res);
+        });
+        io.emit('link', {
+          action: "save",
+          path,
+          payload,
+          signature
+        });
       });
     },
-    update: (collection, payload) => {
-      const payload_hash = nacl.hash(new Uint8Array(JSON.stringify(payload)));
-      const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
-      io.emit('link', {
-        action: "update",
-        collection,
-        payload,
-        signature
+    update: (path, payload) => {
+      return new Promise((resolve, reject) => {
+        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
+        const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
+        console.log('[index.js] update', path, payload, signature);
+        io.once(signature, (data) => {
+          console.log("[index.js] ONCE UPDATE");
+          if (data.err) reject(data.err);
+          if (data.res) resolve(data.res);
+        });
+        io.emit('link', {
+          action: "update",
+          path,
+          payload,
+          signature
+        });
       });
     }
   };

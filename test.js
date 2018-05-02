@@ -14,28 +14,20 @@ store = Store(host, {
 
 store.on('connect', (session) => {
   console.log('connected');
-  store.on('test/session', (output) => {
-    console.log("session callback: ", output);
-    if(output.action === 'query') {
-      // store.delete(output.collection, output.payload);
-    } else if(output.action === 'save') {
-      store.update('test/session', { 
-        target: {
-          hello: 'world'
-        },
-        data: {
-          hello: 'world22'
-        },
-        ops: {
-          upsert:true, 
-          w: 1,
-          multi:true
-        }
-      });
-    } else if(output.action === 'update') {
-      store.query('test/session', { hello: 'world22' });
-    }
-  });
   
-  store.save('test/session', { hello: 'world' });
+  store.on('test/session', (session) => {
+    console.log("[test.js] query: ", session);
+    store.delete('test/session', session).then((data) => {
+      console.log("[test.js] delete: ", data);
+    });
+  });
+
+  store.save('test/session', { hello: 'world' }).then((data) => {
+    console.log("[test.js] save: ", data);
+    data.hello = "worldxxx";
+    store.update('test/session', data).then((update_info) => {
+      console.log("[test.js] update: ", update_info);
+      store.query('test/session', {});
+    });
+  });
 });

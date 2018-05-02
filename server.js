@@ -6,6 +6,11 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
+const dec = nacl.util.decodeBase64;
+
+const db_name = process.argv[2] || 'test';
+const port = process.argv[3] || 3000;
+
 const options = {
   key: fs.readFileSync(path.resolve(__dirname, 'cert.pem')),
   cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt'))
@@ -14,136 +19,114 @@ const options = {
 const server = https.createServer(options);
 const io = socketio(server);
 
-const dec = nacl.util.decodeBase64;
-
 let db = null;
 
-const db_name = process.argv[2] || 'test';
-const port = process.argv[3] || 3000;
+/* https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder  */
+function str2ab(str) {
+  var buf = new ArrayBuffer(str.length); // 2 bytes for each char
+  for (var i = 0; i < str.length; i++) {
+    buf[i] = str.charCodeAt(i);
+  }
+  return new Uint8Array(buf);
+}
 
-const fn = {
-  'query': (db_name, collection, payload, callback) => {
-    // console.log(collection, payload);
-    if(payload._id) delete payload._id;
-    let _db = db.db(db_name);
-    const coll = _db.collection(collection);
-    coll.find(payload).toArray((err, results) => {
-      // console.log("query: ", collection, payload);
-      console.log('query: ', err, results);
-      return err ? callback(err) : callback('query', results);
-    });
-  },
-  'delete': (db_name, collection, payload, callback) => {
-    // console.log(collection, payload);
-    if(payload._id) payload._id = new ObjectID(payload._id);
+const __prepare__ = (socket, data) => {
+  const payload = data.payload || {};
+  if (payload._id) payload._id = new ObjectID(payload._id);
+  
+  const [db_name, collection] = data.path.split("/");
+  let _db = db.db(db_name);
+  const coll = _db.collection(collection);
+  console.log(data);
 
-    console.log("payload: ", payload);
-    let _db = db.db(db_name);
-    const coll = _db.collection(collection);
-    
-    coll.remove(payload, (err, result) => {
-      console.log("delete: ", collection, payload);
-      // console.log(numberOfRemovedDocs.result);
-      return err ? callback(err) : callback('delete', result);
-    });
-  },
-  'save': (db_name, collection, payload, callback) => {
-    // console.log(collection, payload);
-    if(payload._id) payload._id = new ObjectID(payload._id);
+  switch (data.action) {
+    case 'query':
+      console.log('[server.js] query: ', payload);
+      coll.find(payload).toArray((err, results) => {
+        results.forEach((document) => {
+          socket.emit(data.path, document);
+        })
+      });
+      break;
+    case 'delete':
+      console.log("[server.js] delete: ", payload);
+      coll.remove({ _id: payload._id }, (err, res) => {
+        socket.emit(data.signature, {
+          err,
+          res
+        });
+      });
+      break;
+    case 'save':
+      console.log("[server.js] save: ", payload);
+      coll.save(payload, (err, result) => {
+        socket.emit(data.signature, {
+          err,
+          res: result.ops[0]
+        });
+      });
+      break;
+    case 'update':
+      console.log("[server.js] update: ", payload);
+      coll.update({ _id: payload._id }, { '$set': payload }, { w: 1 }, function(err, res) {
+        socket.emit(data.signature, {
+          err,
+          res
+        });
+      });
+      break;
+    default:
+      return null;
+  }
+}
 
-    let _db = db.db(db_name);
-    const coll = _db.collection(collection);
-    coll.save(payload, (err, result) => {
-      // console.log("save: ", collection, payload);
-      console.log(result);
-      console.log('save', err, result.ops);
-      return err ? callback(err) : callback('save', result.ops);
-    });
-  },
-  'update': (db_name, collection, payload, callback) => {
-    // console.log(collection, payload);
-    if(payload.target._id) payload.target._id = new ObjectID(payload.target._id);
-    if(payload.data._id) payload.data._id = new ObjectID(payload.data._id);
-    console.log(payload);
-    let _db = db.db(db_name);
-    const coll = _db.collection(collection);
-    coll.update(payload.target, { '$set': payload.data }, payload.ops, function(err, res) {
-      // console.log("save: ", collection, payload);
-      coll.findOne(payload.target, (err, res) => {
-        console.log('update', err, res);
-        return err ? callback(err) : callback('update', res);
-      })
-    });
-  },
+const __authorize__ = (socket, data) => {
+  // AUTHORIZATION LOGIC 
+  const payload_hash = nacl.hash(str2ab(JSON.stringify(data.payload)));
+  const q = socket.handshake.query;
+  const _first = nacl.sign.detached.verify(payload_hash, dec(data.signature), dec(q.pubkey));
+  
+  const _second = socket.__auth__.restrictions.some((rule) => {
+    if(!data.action) return false;
+    // caso encontre o caminho no perfil do usuario
+    const regex = new RegExp(rule.path);
+    if(regex.test(data.path)) {
+      // confere agora se tem permissão de leitura e/ou escrita
+      if(data.action === 'query') {
+        return (rule.permission.indexOf('r') !== -1);
+      } else {
+        return (rule.permission.indexOf('w') !== -1);
+      }
+    }
+  });
+
+  return _first && _second;
 }
 
 io.on('connection', function(socket, next){
-  console.log('new connection');
-  const q = socket.handshake.query;
-  console.log(q);
-  socket.on('link', function (data) {
-    const [db_name, collection] = data.collection.split("/");
-    // console.log(data);
-    // AUTHORIZATION LOGIC GOES HERE +LATER+
-    const payload_hash = nacl.hash(Buffer.from(JSON.stringify(data.payload)));
-    const _match = nacl.sign.detached.verify(payload_hash, dec(data.signature), dec(q.pubkey));
-
-    const _validate = socket.__auth__.restrictions.some((item) => {
-      if(!data.action) return false;
-      // caso encontre o caminho no perfil do usuario
-      if(item.path.localeCompare(data.collection)) {
-        // confere agora se tem permissão de leitura e/ou escrita
-        if(data.action === 'query') {
-          return (item.permission.indexOf('r') !== -1);
-        } else {
-          return (item.permission.indexOf('w') !== -1);
-        }
-      }
-    });
-    
-    if(!_validate) {
+  console.log('[server.js] new connection');
+  
+  socket.on('link', function (data) {  
+    if(!__authorize__(socket, data)) {
       throw new Error('Authorization error');
     }
-
-    /* -- END AUTH -- */
-
-    fn[data.action](db_name, collection, data.payload, (action, result) => {
-      if (result && result.constructor === Array) {
-        result.forEach((payload) => {
-          console.log(`emit[array]:`, data.collection, payload);
-          io.emit(data.collection, {
-            action: data.action,
-            collection: data.collection,
-            payload
-          });
-        });
-      } else {
-        console.log(`emit[object]: ${result}`);
-        io.emit(data.collection, {
-          action: data.action,
-          collection: data.collection,
-          payload: result
-        });
-      }
-    });
+    __prepare__(socket, data);
   });
 });
 
+// middleware para autenticar com base em chave publica/privada
 io.use((socket, next) => {
-  console.log("---- io.use ----");
   // AUTHENTICATION LOGIC
   const q = socket.handshake.query;
 
   const message = q.message;
-  const signature_is_valid = nacl.sign.detached.verify(new Uint8Array(message), dec(q.signature), dec(q.pubkey));
-  console.log(signature_is_valid);
-  // return the result of next() to accept the connection.
+  const signature_is_valid = nacl.sign.detached.verify(str2ab(message), dec(q.signature), dec(q.pubkey));
   
   let _db = db.db("__auth__");
   const coll = _db.collection("Profiles");
   coll.findOne({pubkeys: q.pubkey}, (err, profile) => {
     if (profile) {
-      console.log('query: ', err, profile);
+      console.log('[server.js] login try: ', err, profile.username);
       socket.__auth__ = profile;
       return next();
     } else if (signature_is_valid) {
@@ -153,6 +136,7 @@ io.use((socket, next) => {
     } else {
       const err = new Error('Authentication error');
       console.log(err)
+      // return the result of next() to accept the connection.
       next(err);
     }
   });
