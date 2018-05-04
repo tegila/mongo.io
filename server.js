@@ -33,7 +33,7 @@ function str2ab(str) {
 const __prepare__ = (socket, data) => {
   const payload = data.payload || {};
   if (payload._id) payload._id = new ObjectID(payload._id);
-  
+
   const [db_name, collection] = data.path.split("/");
   let _db = db.db(db_name);
   const coll = _db.collection(collection);
@@ -44,8 +44,11 @@ const __prepare__ = (socket, data) => {
       console.log('[server.js] query: ', payload);
       coll.find(payload).toArray((err, results) => {
         results.forEach((document) => {
-          socket.emit(data.path, document);
-        })
+          socket.emit(data.path, {
+            type: 'QUERY',
+            data: document
+          });
+        });
       });
       break;
     case 'delete':
@@ -67,8 +70,15 @@ const __prepare__ = (socket, data) => {
       });
       break;
     case 'update':
-      console.log("[server.js] update: ", payload);
-      coll.update({ _id: payload._id }, { '$set': payload }, { w: 1 }, function(err, res) {
+      const target = payload._target ? payload._target : { _id: payload._id };
+      const new_values = payload._data ? payload._data : payload;
+      const ops = payload._ops? payload._ops : { w: 1 };
+      console.log("[server.js] update: ", new_values.id);
+      coll.update(target, { '$set': new_values }, ops, function(err, res) {
+        if (!err) socket.emit(data.path, {
+          type: 'UPDATE',
+          data: new_values
+        });
         socket.emit(data.signature, {
           err,
           res
@@ -107,6 +117,7 @@ io.on('connection', function(socket, next){
   console.log('[server.js] new connection');
   
   socket.on('link', function (data) {  
+    console.log("link");
     if(!__authorize__(socket, data)) {
       throw new Error('Authorization error');
     }

@@ -9,37 +9,39 @@ let io = null;
 
 /* https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder  */
 function str2ab(str) {
-  var buf = new ArrayBuffer(str.length); // 2 bytes for each char
-  for (var i = 0; i < str.length; i++) {
+  const buf = new ArrayBuffer(str.length); // 2 bytes for each char
+  for (let i = 0; i < str.length; i += 1) {
     buf[i] = str.charCodeAt(i);
   }
   return new Uint8Array(buf);
 }
 
-module.exports = (url, old_keypair) => {
+module.exports = (url) => {
   let keypair = {};
-  if (old_keypair) {
-    keypair.secretKey = dec(old_keypair.secretKey);
-    keypair.publicKey = dec(old_keypair.publicKey);
-  } else {
-    keypair = nacl.sign.keyPair();
-  }
-
-  const message = new Date().toString();
-
-  const signature = nacl.sign.detached(str2ab(message), keypair.secretKey);
-
-  const auth = {
-    signature: enc(signature),
-    pubkey: enc(keypair.publicKey),
-    message
-  };
-  const auth_enc = querystring.stringify(auth);
-
-  // https://localhost/socket.io?query={signature=...&pubkey=...&message=...}
-  io = socket.connect(url, { rejectUnauthorized: false, reconnect: true, query: auth_enc });
 
   return {
+    connect: (old_keypair) => {
+      if (old_keypair) {
+        keypair.secretKey = dec(old_keypair.secretKey);
+        keypair.publicKey = dec(old_keypair.publicKey);
+      } else {
+        keypair = nacl.sign.keyPair();
+      }
+
+      const message = new Date().toString();
+
+      const signature = nacl.sign.detached(str2ab(message), keypair.secretKey);
+
+      const auth = {
+        signature: enc(signature),
+        pubkey: enc(keypair.publicKey),
+        message
+      };
+      const auth_enc = querystring.stringify(auth);
+
+      // https://localhost/socket.io?query={signature=...&pubkey=...&message=...}
+      io = socket.connect(url, { rejectUnauthorized: false, reconnect: true, query: auth_enc });
+    },
     on: (topic, callback) => {
       io.on(topic, callback);
     },
@@ -77,7 +79,7 @@ module.exports = (url, old_keypair) => {
       return new Promise((resolve, reject) => {
         const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
-        console.log('[index.js] save', path, payload, signature);
+        console.log('[index.js] save', path, signature);
         io.once(signature, (data) => {
           console.log("[index.js] ONCE SAVE");
           if (data.err) reject(data.err);
@@ -95,7 +97,7 @@ module.exports = (url, old_keypair) => {
       return new Promise((resolve, reject) => {
         const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
-        console.log('[index.js] update', path, payload, signature);
+        console.log('[index.js] update', path, signature);
         io.once(signature, (data) => {
           console.log("[index.js] ONCE UPDATE");
           if (data.err) reject(data.err);

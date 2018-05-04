@@ -17,17 +17,25 @@ store.on('connect', (session) => {
   
   store.on('test/session', (session) => {
     console.log("[test.js] query: ", session);
-    store.delete('test/session', session).then((data) => {
+    /*store.delete('test/session', session).then((data) => {
       console.log("[test.js] delete: ", data);
-    });
+    });*/
   });
 
   store.save('test/session', { hello: 'world' }).then((data) => {
     console.log("[test.js] save: ", data);
+    delete data._id;
     data.hello = "worldxxx";
-    store.update('test/session', data).then((update_info) => {
+    store.update('test/session', {
+      _target: {
+        hello: "world"
+      },
+      _data: data
+    }).then((update_info) => {
       console.log("[test.js] update: ", update_info);
       store.query('test/session', {});
+    }).catch((err) => {
+      console.log("err: ", err);
     });
   });
 });
