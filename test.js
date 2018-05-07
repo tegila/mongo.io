@@ -7,7 +7,8 @@ const Store = require('./index');
 const host = process.env.THOST || "https://localhost:3000";
 console.log(host);
 
-store = Store(host, {
+store = Store(host);
+store.connect({
   publicKey: "MpZfc/HM0OZ5JyNRdrfQOHABhZTaIVrfaRa0VTB65DE=",
   secretKey: "45w67HOo4GfYpHiYVEF+8DdyKjrQFofKXVEFK6joOiYyll9z8czQ5nknI1F2t9A4cAGFlNohWt9pFrRVMHrkMQ=="
 });
