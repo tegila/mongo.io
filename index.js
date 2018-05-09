@@ -49,13 +49,20 @@ module.exports = (url) => {
       io.once(topic, callback);
     },
     query: (path, payload) => {
-      const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
-      const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
-      io.emit('link', {
-        action: "query",
-        path,
-        payload,
-        signature
+      return new Promise((resolve, reject) => {
+        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
+        const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
+        io.once(signature, (data) => {
+          console.log("[index.js] ONCE QUERY");
+          if (data.err) reject(data.err);
+          if (data.res) resolve(data.res);
+        });
+        io.emit('link', {
+          action: "query",
+          path,
+          payload,
+          signature
+        });
       });
     },
     delete: (path, payload) => {

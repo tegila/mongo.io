@@ -34,7 +34,7 @@ store.on('connect', (session) => {
       _data: data
     }).then((update_info) => {
       console.log("[test.js] update: ", update_info);
-      store.query('test/session', {});
+      store.query('test/session', {}).then(console.log);
     }).catch((err) => {
       console.log("err: ", err);
     });

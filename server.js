@@ -30,8 +30,23 @@ function str2ab(str) {
   return new Uint8Array(buf);
 }
 
+const __parse_date__ = (obj) => {
+  var key, value;
+  for (key in obj) {
+    value = obj[key];
+    if (value !== null && typeof value === 'object') {
+      __parse_date__(value);
+    } else if (typeof value === 'string') {
+      if (value.match(/^(\d){4}-(\d){2}-(\d){2}T(\d){2}:(\d){2}:(\d){2}/i)) {
+        obj[key] = new Date(Date.parse(value))
+      }
+    }
+  }
+}
+
 const __prepare__ = (socket, data) => {
   const payload = data.payload || {};
+  __parse_date__(payload);
   if (payload._id) payload._id = new ObjectID(payload._id);
 
   const [db_name, collection] = data.path.split("/");
@@ -42,18 +57,26 @@ const __prepare__ = (socket, data) => {
   switch (data.action) {
     case 'query':
       console.log('[server.js] query: ', payload);
-      coll.find(payload).toArray((err, results) => {
-        results.forEach((document) => {
+      coll.find(payload).toArray((err, res) => {
+        if (!err) res.forEach((document) => {
           socket.emit(data.path, {
             type: 'QUERY',
             data: document
           });
+        });
+        socket.emit(data.signature, {
+          err,
+          res
         });
       });
       break;
     case 'delete':
       console.log("[server.js] delete: ", payload);
       coll.remove({ _id: payload._id }, (err, res) => {
+        if (!err) socket.emit(data.path, {
+          type: 'DELETE',
+          data: payload
+        });
         socket.emit(data.signature, {
           err,
           res
@@ -63,6 +86,10 @@ const __prepare__ = (socket, data) => {
     case 'save':
       console.log("[server.js] save: ", payload);
       coll.save(payload, (err, result) => {
+        if (!err) socket.emit(data.path, {
+          type: 'SAVE',
+          data: payload
+        });
         socket.emit(data.signature, {
           err,
           res: result.ops[0]
