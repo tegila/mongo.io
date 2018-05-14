@@ -38,7 +38,7 @@ const __parse_date__ = (obj) => {
       __parse_date__(value);
     } else if (typeof value === 'string') {
       if (value.match(/^(\d){4}-(\d){2}-(\d){2}T(\d){2}:(\d){2}:(\d){2}/i)) {
-        obj[key] = new Date(Date.parse(value))
+        obj[key] = new Date(Date.parse(value));
       }
     }
   }
@@ -105,7 +105,7 @@ const __execute__ = (socket, data) => {
         });
         socket.emit(data.signature, {
           err,
-          res: result.ops[0]
+          res: result
         });
       });
       break;
