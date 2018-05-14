@@ -44,7 +44,7 @@ const __parse_date__ = (obj) => {
   }
 }
 
-const __prepare__ = (socket, data) => {
+const __execute__ = (socket, data) => {
   const payload = data.payload || {};
   __parse_date__(payload);
   if (payload._id) payload._id = new ObjectID(payload._id);
@@ -55,6 +55,19 @@ const __prepare__ = (socket, data) => {
   console.log(data);
 
   switch (data.action) {
+    case 'lastOne':
+      console.log('[server.js] lastOne: ', payload);
+      coll.findOne(payload, {sort: {$natural: -1}}, (err, res) => {
+        if (!err) socket.emit(data.path, {
+          type: 'lastOne',
+          data: res
+        });
+        socket.emit(data.signature, {
+          err,
+          res
+        });
+      });
+      break;
     case 'query':
       console.log('[server.js] query: ', payload);
       coll.find(payload).toArray((err, res) => {
