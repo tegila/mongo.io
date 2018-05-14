@@ -23,11 +23,11 @@ let db = null;
 
 /* https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder  */
 function str2ab(str) {
-  var buf = new ArrayBuffer(str.length); // 2 bytes for each char
+  var buf = new Uint8Array(str.length); // 2 bytes for each char
   for (var i = 0; i < str.length; i++) {
     buf[i] = str.charCodeAt(i);
   }
-  return new Uint8Array(buf);
+  return buf;
 }
 
 const __parse_date__ = (obj) => {

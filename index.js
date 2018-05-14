@@ -6,14 +6,13 @@ const enc = nacl.util.encodeBase64;
 const dec = nacl.util.decodeBase64;
 let io = null;
 
-
 /* https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder  */
 function str2ab(str) {
-  const buf = new ArrayBuffer(str.length); // 2 bytes for each char
+  const buf = new Uint8Array(str.length); // 2 bytes for each char
   for (let i = 0; i < str.length; i += 1) {
     buf[i] = str.charCodeAt(i);
   }
-  return new Uint8Array(buf);
+  return buf;
 }
 
 module.exports = (url) => {
