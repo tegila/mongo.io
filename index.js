@@ -19,6 +19,15 @@ module.exports = (url) => {
   let keypair = {};
 
   return {
+    me: () => {
+      return new Promise((resolve) => {
+        io.once('me', (data) => {
+          console.log("[index.js] ONCE ME");
+          if (data) resolve(data);
+        });
+        io.emit('me');
+      });
+    },
     connect: (old_keypair) => {
       if (old_keypair) {
         keypair.secretKey = dec(old_keypair.secretKey);

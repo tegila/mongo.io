@@ -136,12 +136,16 @@ const __authorize__ = (socket, data) => {
       }
     }
   });
-
   return _first && _second;
 }
 
 io.on('connection', function(socket, next){
   console.log('[server.js] new connection');
+  
+  socket.on('me', function () {
+    console.log('[server.js] me function');
+    socket.emit('me', socket.__auth__);
+  });
   
   socket.on('link', function (data) {  
     console.log("link");
