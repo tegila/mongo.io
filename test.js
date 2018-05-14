@@ -15,12 +15,14 @@ store.connect({
 
 store.on('connect', (session) => {
   console.log('connected');
-  
+  store.me().then(console.log);
+
   store.on('test/session', (session) => {
-    console.log("[test.js] query: ", session);
-    /*store.delete('test/session', session).then((data) => {
+    if (session.type !== 'lastOne') return;
+    console.log("[test.js] store.on: ", session);
+    store.delete('test/session', session.data).then((data) => {
       console.log("[test.js] delete: ", data);
-    });*/
+    });
   });
 
   store.save('test/session', { hello: 'world' }).then((data) => {
@@ -34,7 +36,7 @@ store.on('connect', (session) => {
       _data: data
     }).then((update_info) => {
       console.log("[test.js] update: ", update_info);
-      store.query('test/session', {}).then(console.log);
+      store.lastOne('test/session', {}).then(console.log);
     }).catch((err) => {
       console.log("err: ", err);
     });
