@@ -137,12 +137,12 @@ const __authorize__ = (socket, data) => {
   const _first = nacl.sign.detached.verify(payload_hash, dec(data.signature), dec(q.pubkey));
   
   const _second = socket.__auth__.restrictions.some((rule) => {
-    if(!data.action) return false;
+    if (!data.action) return false;
     // caso encontre o caminho no perfil do usuario
     const regex = new RegExp(rule.path);
-    if(regex.test(data.path)) {
+    if (regex.test(data.path)) {
       // confere agora se tem permissão de leitura e/ou escrita
-      if(data.action === 'query') {
+      if (data.action === 'query') {
         return (rule.permission.indexOf('r') !== -1);
       } else {
         return (rule.permission.indexOf('w') !== -1);
@@ -161,11 +161,11 @@ io.on('connection', function(socket, next){
   });
   
   socket.on('link', function (data) {  
-    console.log("link");
-    if(!__authorize__(socket, data)) {
-      throw new Error('Authorization error');
+    console.log("[server.js] link");
+    if (!__authorize__(socket, data)) {
+      return new Error('Authorization error');
     }
-    __prepare__(socket, data);
+    __execute__(socket, data);
   });
 });
 
@@ -173,10 +173,15 @@ io.on('connection', function(socket, next){
 io.use((socket, next) => {
   // AUTHENTICATION LOGIC
   const q = socket.handshake.query;
-
   const message = q.message;
-  const signature_is_valid = nacl.sign.detached.verify(str2ab(message), dec(q.signature), dec(q.pubkey));
   
+  const signature_is_valid = nacl.sign.detached.verify(str2ab(message), dec(q.signature), dec(q.pubkey));
+  if (!signature_is_valid) {
+    const err = new Error('Signature isn\'t valid !!');
+    console.log(err);
+    next(err);
+  }
+
   let _db = db.db("__auth__");
   const coll = _db.collection("Profiles");
   coll.findOne({pubkeys: q.pubkey}, (err, profile) => {
@@ -184,10 +189,6 @@ io.use((socket, next) => {
       console.log('[server.js] login try: ', err, profile.username);
       socket.__auth__ = profile;
       return next();
-    } else if (signature_is_valid) {
-      const err = new Error('Signature is valid but can\'t find the user');
-      console.log(err)
-      next(err);
     } else {
       const err = new Error('Authentication error');
       console.log(err)
