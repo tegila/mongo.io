@@ -79,9 +79,10 @@ module.exports = (url) => {
         const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
         io.once(signature, (data) => {
-          console.log("[index.js] ONCE QUERY");
-          if (data.err) reject(data.err);
-          if (data.res) resolve(data.res);
+          const _local = Object.assign({}, data);
+          // console.log("[index.js] ONCE QUERY", _local);
+          if (_local.err) reject(_local.err);
+          if (_local.res) resolve(_local.res);
         });
         io.emit('link', {
           action: "query",

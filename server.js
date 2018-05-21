@@ -71,12 +71,15 @@ const __execute__ = (socket, data) => {
     case 'query':
       console.log('[server.js] query: ', payload);
       coll.find(payload).toArray((err, res) => {
+        /*
         if (!err) res.forEach((document) => {
           socket.emit(data.path, {
-            type: 'QUERY',
+            type: `QUERY`,
             data: document
           });
         });
+        */
+        console.log(res.length);
         socket.emit(data.signature, {
           err,
           res
@@ -88,6 +91,7 @@ const __execute__ = (socket, data) => {
       coll.remove({ _id: payload._id }, (err, res) => {
         if (!err) socket.emit(data.path, {
           type: 'DELETE',
+          path: data.path,
           data: payload
         });
         socket.emit(data.signature, {
@@ -101,6 +105,7 @@ const __execute__ = (socket, data) => {
       coll.save(payload, (err, result) => {
         if (!err) socket.emit(data.path, {
           type: 'SAVE',
+          path: data.path,
           data: payload
         });
         socket.emit(data.signature, {
@@ -117,6 +122,7 @@ const __execute__ = (socket, data) => {
       coll.update(target, { '$set': new_values }, ops, function(err, res) {
         if (!err) socket.emit(data.path, {
           type: 'UPDATE',
+          path: data.path,
           data: new_values
         });
         socket.emit(data.signature, {
@@ -152,7 +158,7 @@ const __authorize__ = (socket, data) => {
   return _first && _second;
 }
 
-io.on('connection', function(socket, next){
+io.on('connection', function(socket, next) {
   console.log('[server.js] new connection');
   
   socket.on('me', function () {
