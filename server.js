@@ -58,10 +58,6 @@ const __execute__ = (socket, data) => {
     case 'lastOne':
       console.log('[server.js] lastOne: ', payload);
       coll.findOne(payload, {sort: {$natural: -1}}, (err, res) => {
-        if (!err) socket.emit(data.path, {
-          type: 'lastOne',
-          data: res
-        });
         socket.emit(data.signature, {
           err,
           res
@@ -71,15 +67,6 @@ const __execute__ = (socket, data) => {
     case 'query':
       console.log('[server.js] query: ', payload);
       coll.find(payload).toArray((err, res) => {
-        /*
-        if (!err) res.forEach((document) => {
-          socket.emit(data.path, {
-            type: `QUERY`,
-            data: document
-          });
-        });
-        */
-        console.log(res.length);
         socket.emit(data.signature, {
           err,
           res
@@ -89,7 +76,7 @@ const __execute__ = (socket, data) => {
     case 'delete':
       console.log("[server.js] delete: ", payload);
       coll.remove({ _id: payload._id }, (err, res) => {
-        if (!err) socket.emit(data.path, {
+        if (!err) io.sockets.emit(data.path, {
           type: 'DELETE',
           path: data.path,
           data: payload
@@ -103,7 +90,7 @@ const __execute__ = (socket, data) => {
     case 'save':
       console.log("[server.js] save: ", payload);
       coll.save(payload, (err, result) => {
-        if (!err) socket.emit(data.path, {
+        if (!err) io.sockets.emit(data.path, {
           type: 'SAVE',
           path: data.path,
           data: payload
@@ -120,7 +107,7 @@ const __execute__ = (socket, data) => {
       const ops = payload._ops? payload._ops : { w: 1 };
       console.log("[server.js] update: ", new_values.id);
       coll.update(target, { '$set': new_values }, ops, function(err, res) {
-        if (!err) socket.emit(data.path, {
+        if (!err) io.sockets.emit(data.path, {
           type: 'UPDATE',
           path: data.path,
           data: new_values

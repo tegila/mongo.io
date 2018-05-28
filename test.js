@@ -5,7 +5,6 @@ const should = chai.should();
 const Store = require('./index');
 const config = require('./config');
 
-
 store = Store(config.host);
 store.connect(config.keychain);
 
@@ -14,7 +13,7 @@ store.on('connect', (session) => {
   store.me().then(console.log);
 
   store.on('test/session', (session) => {
-    console.log("[test.js] store.on: ", session);
+    console.log("GLOBAL [test.js] store.on: ", session);
   });
 
   store.save('test/session', { hello: 'world' }).then((data) => {
@@ -30,7 +29,7 @@ store.on('connect', (session) => {
       console.log("[test.js] update: ", update_info);
       store.lastOne('test/session', {}).then((session) => {
         console.log(data);
-        store.delete('test/session', session.data).then((data) => {
+        store.delete('test/session', data).then((data) => {
           console.log("[test.js] delete: ", data);
         });
       });

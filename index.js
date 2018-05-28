@@ -28,16 +28,14 @@ module.exports = (url) => {
         io.emit('me');
       });
     },
-    connect: (old_keypair) => {
-      if (old_keypair) {
-        keypair.secretKey = dec(old_keypair.secretKey);
-        keypair.publicKey = dec(old_keypair.publicKey);
-      } else {
-        keypair = nacl.sign.keyPair();
-      }
+    generate_key: () => {
+      return nacl.sign.keyPair().secretKey;
+    },
+    connect: (secretKey) => {
+      if (!secretKey) return;
 
+      keypair = nacl.sign.keyPair.fromSecretKey(dec(secretKey));
       const message = new Date().toString();
-
       const signature = nacl.sign.detached(str2ab(message), keypair.secretKey);
 
       const auth = {
