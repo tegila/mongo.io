@@ -1,7 +1,7 @@
 module.exports = {
   host: process.env.THOST || "https://localhost:3000",
   keychain: {
-    publicKey: "MpZfc/HM0OZ5JyNRdrfQOHABhZTaIVrfaRa0VTB65DE=",
-    secretKey: "45w67HOo4GfYpHiYVEF+8DdyKjrQFofKXVEFK6joOiYyll9z8czQ5nknI1F2t9A4cAGFlNohWt9pFrRVMHrkMQ=="
+    publicKey: "fmDWLhjWZ/y/N9EMv3tJhUqf7g4mmJ7RnXuId/GCqXc=",
+    secretKey: "m4WhUx5ApntkoY/QsolAWryZ4MR7cuYXSFUSrsGILUR+YNYuGNZn/L830Qy/e0mFSp/uDiaYntGde4h38YKpdw=="
   }
 }

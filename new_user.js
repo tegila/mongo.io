@@ -21,6 +21,6 @@ MongoClient.connect(url, (err, connection) => {
       permission: ['r', 'w']
     }]
   }, (err, result) => {
-    console.log(err, result);
+    console.log(err, result.ops);
   });
 });

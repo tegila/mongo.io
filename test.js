@@ -6,7 +6,7 @@ const Store = require('./index');
 const config = require('./config');
 
 store = Store(config.host);
-store.connect(config.keychain);
+store.connect(config.keychain.secretKey);
 
 store.on('connect', (session) => {
   console.log('connected');
