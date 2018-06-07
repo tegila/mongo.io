@@ -135,7 +135,7 @@ const __authorize__ = (socket, data) => {
     const regex = new RegExp(rule.path);
     if (regex.test(data.path)) {
       // confere agora se tem permissão de leitura e/ou escrita
-      if (data.action === 'query') {
+      if (data.action === 'query' || data.action === 'lastOne') {
         return (rule.permission.indexOf('r') !== -1);
       } else {
         return (rule.permission.indexOf('w') !== -1);
