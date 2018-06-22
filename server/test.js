@@ -1,9 +1,6 @@
-const chai = require('chai');
-const expect = chai.expect;
-const should = chai.should();
 // redux store - persistence layer
-const Store = require('./index');
-const config = require('./config');
+const Store = require('../client/index');
+const config = require('../config');
 
 store = Store(config.host);
 store.connect(config.keychain.secretKey);

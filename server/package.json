@@ -1,0 +1,19 @@
+{
+  "name": "mongo.io-server",
+  "version": "0.0.7",
+  "description": "minimalist pub/sub socket.io persisted in mongodb",
+  "repository": "git://github.com/tegila/mongo.io/",
+  "main": "index.js",
+  "scripts": {
+    "test": "env KEY=http://localhost:3000 mocha test/*.js"
+  },
+  "author": "Edson Tégila Gonçalves",
+  "license": "PRIVATE",
+  "dependencies": {
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "connect-mongo": "*",
+    "socket.io": "^2.1.0",
+    "tweetnacl": "0.13.1"
+  }
+}

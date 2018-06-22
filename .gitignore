@@ -5,6 +5,7 @@ config.coffee
 ###########
 
 node_modules/
+sample/
 common/lib/
 public/
 build/
@@ -50,8 +51,5 @@ Thumbs.db
 
 .c9revisions
 .settings
-
-yarn.lock
-#cert*
 
 yarn*

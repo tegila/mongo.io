@@ -1,23 +1,17 @@
 {
-  "name": "mongo.io",
+  "name": "mongo.io-client",
   "version": "0.0.7",
   "description": "minimalist pub/sub socket.io persisted in mongodb",
   "repository": "git://github.com/tegila/mongo.io/",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "env KEY=http://localhost:3000 mocha test/*.js"
   },
   "author": "Edson Tégila Gonçalves",
   "license": "PRIVATE",
   "dependencies": {
-    "Buffer": "^0.0.0",
-    "babel-preset-es2015": "^6.24.1",
-    "connect-mongo": "*",
-    "socket.io": "^2.1.0",
+    "querystring": "^0.2.0",
     "socket.io-client": "^2.1.0",
     "tweetnacl": "0.13.1"
-  },
-  "devDependencies": {
-    "chai": "*"
   }
 }

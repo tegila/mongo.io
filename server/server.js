@@ -12,8 +12,8 @@ const db_name = process.argv[2] || 'test';
 const port = process.argv[3] || 3000;
 
 const options = {
-  key: fs.readFileSync(path.resolve(__dirname, 'cert.pem')),
-  cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt'))
+  key: fs.readFileSync(path.resolve(__dirname, '../sample/cert.pem')),
+  cert: fs.readFileSync(path.resolve(__dirname, '../sample/cert.crt'))
 };
 
 const server = https.createServer(options);
