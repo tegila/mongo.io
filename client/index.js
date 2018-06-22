@@ -48,6 +48,9 @@ module.exports = (url) => {
       // https://localhost/socket.io?query={signature=...&pubkey=...&message=...}
       io = socket.connect(url, { rejectUnauthorized: false, reconnect: true, query: auth_enc });
     },
+    close: () => {
+      io.close();
+    },
     on: (topic, callback) => {
       io.on(topic, callback);
     },
