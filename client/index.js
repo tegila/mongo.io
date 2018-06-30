@@ -15,6 +15,19 @@ function str2ab(str) {
   return buf;
 }
 
+// https://stackoverflow.com/questions/12075927/serialization-of-regexp
+const __parse_regex__ = (obj) => {
+  var key, value;
+  for (key in obj) {
+    value = obj[key];
+    if (value !== null && typeof value === 'object') {
+      __parse_regex__(value);
+    } else if (value instanceof RegExp) {
+      obj[key] = ("__REGEXP " + value.toString());
+    }
+  }
+}
+
 module.exports = (url) => {
   let keypair = {};
 

@@ -39,6 +39,9 @@ const __parse_date__ = (obj) => {
     } else if (typeof value === 'string') {
       if (value.match(/^(\d){4}-(\d){2}-(\d){2}T(\d){2}:(\d){2}:(\d){2}/i)) {
         obj[key] = new Date(Date.parse(value));
+      } else if (value.indexOf("__REGEXP ") == 0) {
+        var m = value.split("__REGEXP ")[1].match(/\/(.*)\/(.*)?/);
+        obj[key] = new RegExp(m[1], m[2] || "");
       }
     }
   }
