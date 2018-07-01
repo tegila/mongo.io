@@ -57,18 +57,18 @@ module.exports = (url) => {
     once: (topic, callback) => {
       io.once(topic, callback);
     },
-    lastOne: (path, payload) => {
+    findOne: (path, payload) => {
       return new Promise((resolve, reject) => {
         const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
         io.once(signature, (data) => {
           const _local = Object.assign({}, data);
-          console.log("[index.js] ONCE lastOne", _local);
+          console.log("[index.js] ONCE findOne", _local);
           if (_local.err) reject(_local.err);
           if (_local.res) resolve(_local.res);
         });
         io.emit('link', {
-          action: "lastOne",
+          action: "findOne",
           path,
           payload,
           signature
@@ -93,7 +93,7 @@ module.exports = (url) => {
         });
       });
     },
-    delete: (path, payload) => {
+    remove: (path, payload) => {
       return new Promise((resolve, reject) => {
         const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
@@ -103,7 +103,7 @@ module.exports = (url) => {
           if (data.res) resolve(data.res);
         });
         io.emit('link', {
-          action: "delete",
+          action: "remove",
           path,
           payload,
           signature
@@ -118,7 +118,7 @@ module.exports = (url) => {
         io.once(signature, (data) => {
           console.log("[index.js] ONCE SAVE");
           if (data.err) reject(data.err);
-          if (data.res) resolve(data.res);
+          if (data) resolve(data);
         });
         io.emit('link', {
           action: "save",
@@ -136,7 +136,7 @@ module.exports = (url) => {
         io.once(signature, (data) => {
           console.log("[index.js] ONCE UPDATE");
           if (data.err) reject(data.err);
-          if (data.res) resolve(data.res);
+          if (data) resolve(data);
         });
         io.emit('link', {
           action: "update",
