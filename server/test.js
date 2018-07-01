@@ -1,8 +1,8 @@
 // redux store - persistence layer
 const Store = require('../client/index');
-const config = require('../config');
+const config = require('../sample/config');
 
-store = Store(config.host);
+store = Store("https://localhost:3000");
 store.connect(config.keychain.secretKey);
 
 store.on('connect', (session) => {
@@ -24,9 +24,9 @@ store.on('connect', (session) => {
       _data: data
     }).then((update_info) => {
       console.log("[test.js] update: ", update_info);
-      store.lastOne('test/session', {}).then((session) => {
+      store.findOne('test/session', {}).then((session) => {
         console.log(data);
-        store.delete('test/session', data).then((data) => {
+        store.remove('test/session', data).then((data) => {
           console.log("[test.js] delete: ", data);
         });
       });

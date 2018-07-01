@@ -13,6 +13,7 @@
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "connect-mongo": "*",
+    "es6-promise": "^4.2.4",
     "socket.io": "^2.1.0",
     "tweetnacl": "0.13.1"
   }
