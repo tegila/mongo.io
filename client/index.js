@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const socket = require('socket.io-client');
 const nacl = require('tweetnacl');
 const querystring = require('querystring');
@@ -20,10 +22,10 @@ const __parse_regex__ = (obj) => {
   var key, value;
   for (key in obj) {
     value = obj[key];
-    if (value !== null && typeof value === 'object') {
-      __parse_regex__(value);
-    } else if (value instanceof RegExp) {
+    if (value !== null && value instanceof RegExp) {
       obj[key] = ("__REGEXP " + value.toString());
+    } else if (typeof value === 'object') {
+      __parse_regex__(value);
     }
   }
 }
@@ -89,6 +91,8 @@ module.exports = (url) => {
       });
     },
     query: (path, payload) => {
+      __parse_regex__(payload);
+      console.log(payload);
       return new Promise((resolve, reject) => {
         const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
