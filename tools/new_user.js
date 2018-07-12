@@ -1,6 +1,7 @@
 const { MongoClient, ObjectID } = require('mongodb')
 const nacl = require('tweetnacl');
-const enc = nacl.util.encodeBase64;
+const util = require('tweetnacl-util');
+const enc = util.encodeBase64;
 
 const keypair = nacl.sign.keyPair();
 
