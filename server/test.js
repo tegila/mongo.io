@@ -2,7 +2,7 @@
 const Store = require('../client/index');
 const config = require('../sample/config');
 
-store = Store("https://localhost:3000");
+store = Store(config.host);
 store.connect(config.keychain.secretKey);
 
 store.on('connect', (session) => {
