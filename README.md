@@ -27,9 +27,10 @@ O mongoDB tem atendido as necessidades do sistema, mas está sendo avaliada uma 
 > Then a file.crt file will be created containing an SSL certificate.
 
 `openssl x509 -req -days 365 -in cert_csr.pem -signkey cert.pem -out cert.crt`
+
 `node server.js --harmony --use_strict`
 
-[reference](https://medium.com/@dai_shi/tail-call-optimization-tco-in-node-v6-e2492c9d5b7c)
+[Reference](https://medium.com/@dai_shi/tail-call-optimization-tco-in-node-v6-e2492c9d5b7c)
 
 # Using
 
