@@ -14,6 +14,9 @@ Está sendo utilizado o mongoDB, que é um banco de dados noSQL, cuja forma de a
 
 O mongoDB tem atendido as necessidades do sistema, mas está sendo avaliada uma mudança para o RethinkDB.
 
+![Diagrama](http://i1321.photobucket.com/albums/u551/Leinza/diagrama-mongo_zpsj8pzguy6.png "Diagrama")
+
+
 # Installing 
 
 > The command below it is going to generate a file containing an RSA key.
