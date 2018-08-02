@@ -1,6 +1,7 @@
 # Who am I?
 
 O mongo.io é formado por 2 programas: "backend" que trabalha junto com o mongoDB e "client" (frontend) que funciona como uma biblioteca para node.js ou para o browser.
+
 Este sistema tem vários pontos de entrada, que são conhecidos como endpoints. O programa "client" se conecta nesses endpoints e escolhe qual operação ele quer executar. Atualmente existem 5 operações: SAVE, REMOVE, QUERY, FINDONE e UPDATE.
 O mongo.io utiliza uma assinatura digital (DSA) em todas as mensagens enviadas do frontend para o backend, inclusive na conexão, para que o servidor consiga verificar se o cliente realmente tem autorização para salvar, alterar ou excluir qualquer informação do banco de dados. Essa autorização utiliza duas etapas de verificação: chave pública e assinatura. A combinação de ambas autoriza ou não a ação do cliente.
 Para isso, estão sendo utilizadas 3 bibliotecas: nacl (criptografia) + socketio (conexão) + mongoclient (persistência - interface com o banco de dados).
@@ -11,12 +12,15 @@ O mongoDB tem atendido as necessidades do sistema, mas está sendo avaliada uma 
 # Installing 
 
 > The command below it is going to generate a file containing an RSA key.
+
 `openssl genrsa 1024 > cert.pem`
 
 > Here you will be asked to input data but you can leave blank pressing enter until the crs.pem is generated.
+
 `openssl req -new -key cert.pem -out cert_csr.pem`
 
 > Then a file.crt file will be created containing an SSL certificate.
+
 `openssl x509 -req -days 365 -in cert_csr.pem -signkey cert.pem -out cert.crt`
 `node server.js --harmony --use_strict`
 
