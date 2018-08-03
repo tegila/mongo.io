@@ -11,7 +11,7 @@ export const enable = (url, callback) => {
   });
 }
 
-const __parse_date__ = (obj) => {
+export const __parse_date__ = (obj) => {
   var key, value;
   for (key in obj) {
     value = obj[key];
