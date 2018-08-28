@@ -2,10 +2,11 @@
 
 const socket = require('socket.io-client');
 const nacl = require('tweetnacl');
+const util = require('tweetnacl-util');
 const querystring = require('querystring');
 
-const enc = nacl.util.encodeBase64;
-const dec = nacl.util.decodeBase64;
+const enc = util.encodeBase64;
+const dec = util.decodeBase64;
 let io = null;
 
 /* https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder  */
