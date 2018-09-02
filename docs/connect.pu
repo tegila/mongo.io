@@ -1,0 +1,26 @@
+@startuml
+actor Foo
+boundary socket.io
+control socket.js
+control auth.js
+entity tweetnacl
+entity mongo.js
+database MongoDB
+Foo -> socket.io: `connect: (secretKey)`
+socket.io -> socket.js: `io.use((socket, next)`
+socket.js -> auth.js: `__check_signature__`
+auth.js -> tweetnacl: detached.verify(\nstr2ab(message),\ndec(signature),\ndec(pubkey));
+auth.js <- tweetnacl: `boolean`
+socket.js <- auth.js: `boolean`
+socket.js -> auth.js: `__profile__`
+auth.js -> mongo.js: `select_collection`
+mongo.js -> MongoDB: `collection(collection)`
+mongo.js <- MongoDB: `<Collection>`
+auth.js <- mongo.js: `<Collection>`
+auth.js -> mongo.js: `findOne`
+mongo.js -> MongoDB: `coll.findOne(\n\tpayload, \n\t{sort: {$natural: -1}}, \n\tcallback)`
+mongo.js <- MongoDB: `<Profile>`
+auth.js <- mongo.js: `<Profile>`
+socket.js <- auth.js: `<Profile>`
+socket.js -> socket.io: `return next()`
+@enduml
