@@ -1,6 +1,6 @@
 // redux store - persistence layer
 const Store = require('../client/index');
-const config = require('../sample/config');
+const config = require('./sample/config');
 
 store = Store(config.host);
 store.connect(config.keychain.secretKey);

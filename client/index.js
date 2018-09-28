@@ -1,39 +1,11 @@
 /* eslint-disable */
 
 const socket = require('socket.io-client');
-const nacl = require('tweetnacl');
-const util = require('tweetnacl-util');
 const querystring = require('querystring');
 
-const enc = util.encodeBase64;
-const dec = util.decodeBase64;
 let io = null;
 
-/* https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder  */
-function str2ab(str) {
-  const buf = new Uint8Array(str.length); // 2 bytes for each char
-  for (let i = 0; i < str.length; i += 1) {
-    buf[i] = str.charCodeAt(i);
-  }
-  return buf;
-}
-
-// https://stackoverflow.com/questions/12075927/serialization-of-regexp
-const __parse_regex__ = (obj) => {
-  var key, value;
-  for (key in obj) {
-    value = obj[key];
-    if (value !== null && value instanceof RegExp) {
-      obj[key] = ("__REGEXP " + value.toString());
-    } else if (typeof value === 'object') {
-      __parse_regex__(value);
-    }
-  }
-}
-
 module.exports = (url) => {
-  let keypair = {};
-
   return {
     me: () => {
       return new Promise((resolve) => {
@@ -44,23 +16,8 @@ module.exports = (url) => {
         io.emit('me');
       });
     },
-    generate_key: () => {
-      return nacl.sign.keyPair().secretKey;
-    },
     connect: (secretKey) => {
-      if (!secretKey) return;
-
-      keypair = nacl.sign.keyPair.fromSecretKey(dec(secretKey));
-      const message = new Date().toString();
-      const signature = nacl.sign.detached(str2ab(message), keypair.secretKey);
-
-      const auth = {
-        signature: enc(signature),
-        pubkey: enc(keypair.publicKey),
-        message
-      };
-      const auth_enc = querystring.stringify(auth);
-
+      const auth_enc = authenticate(secretKey);
       // https://localhost/socket.io?query={signature=...&pubkey=...&message=...}
       io = socket.connect(url, { rejectUnauthorized: false, reconnect: true, query: auth_enc });
     },
