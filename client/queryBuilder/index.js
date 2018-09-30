@@ -28,3 +28,7 @@ payload: {
   limit: Number,
   skip: Number
 }
+
+
+
+new queryBuilder().find({ id: _id }).order({ id: -1 }).skip(300).limit(300)

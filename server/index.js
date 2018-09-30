@@ -10,8 +10,8 @@ const socket = require('./socket');
 const mongo = require('./mongo');
 
 const options = {
-  key: fs.readFileSync(path.resolve(__dirname, './sample/cert.pem')),
-  cert: fs.readFileSync(path.resolve(__dirname, './sample/cert.crt'))
+  key: fs.readFileSync(path.resolve(__dirname, './cert.pem')),
+  cert: fs.readFileSync(path.resolve(__dirname, './cert.crt'))
 };
 const port = process.argv[3] || 3000;
 
