@@ -66,9 +66,11 @@ services:
     restart: always
     ports:
       - 8081:8081
-#    environment:
-#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-#      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    environment:
+      VIRTUAL_HOST: express.tegila.com.br
+      VIRTUAL_PORT: 8081
+#     ME_CONFIG_MONGODB_ADMINUSERNAME: root
+#     ME_CONFIG_MONGODB_ADMINPASSWORD: example
   web:
     build: .
     ports:
@@ -77,6 +79,11 @@ services:
     - .:/code
     links:
     - mongo
+    environment:
+      VIRTUAL_HOST: store.tegila.com.br
+      VIRTUAL_PORT: 3000
+      #LETSENCRYPT_HOST: store.tegila.com.br
+      #LETSENCRYPT_EMAIL: etegila@gmail.com
 
 networks:
   default:
