@@ -1,5 +1,13 @@
+const find = require('./find');
+//const remove = require('./remove');
 
-export default (collection) => {
+const load = { 
+  transaction: {
+    collection,
+    payload: {}
+  }
+};
+const queryBuilder = (collection) => {
   const load = { 
     transaction: {
       collection,
@@ -7,15 +15,28 @@ export default (collection) => {
     }
   };
 
-  this.prototype.order = (order) => {
+
+
+  if (this instanceof queryBuilder) {
+    console.log('instanceOf');
+    return this.queryBuilder;
+  } else {
+    console.log('new');
+    const _current = new queryBuilder();
+    _current.transaction = { collection };
+    return _current;
+  }  
+};
+
+  queryBuilder.prototype.remove = (order) => {
     Object.assign(load.payload, { order });
     return this;
   };
   
-  this.prototype.find = (query) => {
-    Object.assign(load.payload, { query });
-    return this;
+  queryBuilder.prototype.find = (query) => {
+    return find(query);
   };
+<<<<<<< HEAD
 
   return this;
 };
@@ -32,3 +53,6 @@ payload: {
 
 
 new queryBuilder().find({ id: _id }).order({ id: -1 }).skip(300).limit(300)
+=======
+module.exports = queryBuilder;
+>>>>>>> cdfb6ca1f7f512bb04a0b12f9abdfe6021181075
