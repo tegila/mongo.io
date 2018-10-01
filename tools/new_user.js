@@ -5,10 +5,10 @@ const enc = util.encodeBase64;
 
 const keypair = nacl.sign.keyPair();
 
-console.log(enc(keypair.secretKey));
-console.log(enc(keypair.publicKey));
+console.log(`Private KEY ====> ${enc(keypair.secretKey)}`);
+console.log(`Public KEY ====> ${enc(keypair.publicKey)}`);
 
-const url = `mongodb://127.0.0.1:27017/__auth__`
+const url = `mongodb://mongo:27017/__auth__`
 MongoClient.connect(url, (err, connection) => {
   if(!connection) process.exit();
   console.log("MongoDB Connected");
@@ -23,5 +23,6 @@ MongoClient.connect(url, (err, connection) => {
     }]
   }, (err, result) => {
     console.log(err, result.ops);
+    db.close();
   });
 });

@@ -1,9 +1,8 @@
 // redux store - persistence layer
 const Store = require('../client/index');
-const config = require('./sample/config');
 
-store = Store(config.host);
-store.connect(config.keychain.secretKey);
+store = Store("http://localhost");
+store.connect("Kz4JQuFiq7gXvbBLKGdtqhRG9JS56gtScriE4vviCnRzHTVCkrxw");
 
 store.on('connect', (session) => {
   console.log('connected');
