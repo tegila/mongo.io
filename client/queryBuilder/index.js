@@ -36,23 +36,4 @@ const queryBuilder = (collection) => {
   queryBuilder.prototype.find = (query) => {
     return find(query);
   };
-<<<<<<< HEAD
-
-  return this;
-};
-
-export const find = query
-action: ["find", "findone", "remove", "insert", "update"],
-payload: {
-  query: Object,
-  order: Object,
-  limit: Number,
-  skip: Number
-}
-
-
-
-new queryBuilder().find({ id: _id }).order({ id: -1 }).skip(300).limit(300)
-=======
 module.exports = queryBuilder;
->>>>>>> cdfb6ca1f7f512bb04a0b12f9abdfe6021181075
