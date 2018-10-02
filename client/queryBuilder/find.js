@@ -5,6 +5,11 @@ const Find = (query) => ({
     payload = Object.assign({}, payload, { find: query });
     return Find(query);
   },
+  findOne: (query) => {
+    console.log('findOne');
+    payload = Object.assign({}, payload, { findOne: query });
+    return Find(query);
+  },
   sort: (sort) => {
     console.log('sort');
     payload = Object.assign({}, payload, { sort: sort });
