@@ -7,4 +7,12 @@ qb("Collection")
   .limit(2)
   .skip(1)
   .payload();
+
+  console.log('------------');
+
+ qb('Person').insert().insertOne({
+    name: 'sue',
+    age: 26,
+    status: 'pending'
+  }).payload();  
     

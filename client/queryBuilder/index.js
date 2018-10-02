@@ -1,4 +1,5 @@
 const find = require('./find');
+const insert = require('./insert');
 //const remove = require('./remove');
 
 function queryBuilder(collection) {
@@ -27,6 +28,10 @@ function queryBuilder(collection) {
   
   queryBuilder.prototype.select = () => {
     return find();
+  };
+
+  queryBuilder.prototype.insert = () => {
+    return insert();
   };
 
 module.exports = queryBuilder;
