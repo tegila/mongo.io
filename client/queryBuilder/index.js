@@ -25,9 +25,8 @@ function queryBuilder(collection) {
     return this;
   };
   
-  queryBuilder.prototype.find = (query) => {
-    return find(query);
+  queryBuilder.prototype.select = () => {
+    return find();
   };
-  
 
 module.exports = queryBuilder;
