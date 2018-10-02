@@ -1,10 +1,5 @@
 let payload = {};
-const Insert = (data) => ({
-  insertOne: (data) => {
-    console.log('insertOne');
-    payload = Object.assign({}, payload, { insertOne: data });
-    return Insert(data);
-  },
+const Insert = () => ({
   insertMany: (data) => {
     console.log('insertMany');
     payload = Object.assign({}, payload, { insertMany: data });
