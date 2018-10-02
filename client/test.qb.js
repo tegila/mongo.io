@@ -10,9 +10,16 @@ qb("Collection")
 
   console.log('------------');
 
- qb('Person').insert().insertOne({
+ qb('Person').insert().insertMany([
+  {
     name: 'sue',
     age: 26,
     status: 'pending'
-  }).payload();  
+  },
+  {
+    name: 'jhon',
+    age: 16,
+    status: 'accepted'
+  },
+]).payload();  
     
