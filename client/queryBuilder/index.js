@@ -1,6 +1,6 @@
 const find = require('./find');
 const insert = require('./insert');
-//const remove = require('./remove');
+const remove = require('./remove');
 
 function queryBuilder(collection) {
   this.load = {
@@ -21,9 +21,8 @@ function queryBuilder(collection) {
   }
 };
 
-  queryBuilder.prototype.remove = (order) => {
-    Object.assign(load.payload, { order });
-    return this;
+  queryBuilder.prototype.remove = () => {
+    return remove();
   };
   
   queryBuilder.prototype.select = () => {
