@@ -1,23 +1,50 @@
-# Who am I?
+# What is mongo.io ?
 
-O mongo.io é formado por 2 programas: "backend" que trabalha junto com o mongoDB e "client" (frontend) que funciona como uma biblioteca para node.js ou para o browser.
+Mongo.io is separated between two projects:
+ - *Backend* interface for mongodb database plus a layer of crypto validation.
+ - *Client* Delicious ES6 Browser or Node.js implementation.
 
-Este sistema tem vários pontos de entrada, que são conhecidos como endpoints. O programa "client" se conecta nesses endpoints e escolhe qual operação ele quer executar. Atualmente existem 5 operações: SAVE, REMOVE, QUERY, FINDONE e UPDATE.
+We use Digital Signature Algorithm (DSA) to validate the communications between the client-server, on EVERY message. Using this way the server can know if the client is able to execute the procedure he wants without all those *OAUTH* procedures that normally delay the projects ALOT.
 
-O mongo.io utiliza uma assinatura digital (DSA) em todas as mensagens enviadas do frontend para o backend, inclusive na conexão, para que o servidor consiga verificar se o cliente realmente tem autorização para salvar, alterar ou excluir qualquer informação do banco de dados. Essa autorização utiliza duas etapas de verificação: chave pública e assinatura. A combinação de ambas autoriza ou não a ação do cliente.
+The server only had the Pubkey and a restrictions table which give the user permission rules to access the data.
 
-Para isso, estão sendo utilizadas 3 bibliotecas: nacl (criptografia) + socketio (conexão) + mongoclient (persistência - interface com o banco de dados).
+The connection string is also signed (DSA) by the client and checked by the server authorization rules. The same will happen to every message sent to the server.
 
-Foi avaliada a possibilidade de usar o Firebase do Google, mas este se mostrou limitado, pois não permite a integração com outras ferramentas. Montar o próprio sistema deu a abertura necessária para essa integração.
+This project has only 3 dependencies and the purpose is to *keep it simple*:
+ - TweetNaCl
+ - Socket.io
+ - MongoClient (Native driver).
 
-Está sendo utilizado o mongoDB, que é um banco de dados noSQL, cuja forma de armazenamento não é tabelar, como o Excel. A estrutura de dados hierárquica (árvore) possibilita salvar objetos inteiros, conforme eles aparecem no programa feito em javascript. O noSQL se preocupa apenas em salvar a informação, não importando a forma como ela será salva. Isso permite a utilização de dados complexos sem precisar padronizá-los. Após salvar o dado, ele retorna um id para poder localizá-lo futuramente.
+During this research we consider using the Firebase from Google and still using it for notification and other critical usages but avoided it for simple CRUD instructions.
 
-O mongoDB tem atendido as necessidades do sistema, mas está sendo avaliada uma mudança para o RethinkDB.
+On the backend we have the good old MongoDB and all the ecosystem that come with it.
 
-![Diagrama](http://i1321.photobucket.com/albums/u551/Leinza/diagrama-mongo_zpsj8pzguy6.png "Diagrama")
+The most important part of this research was about not over complexify the application using *previous declarations of data objects*, *complex connection setup* and *low learning curve projects like GraphQL*.
 
+So now we can use the database without caring too much about data structure. 
 
-# Installing 
+P.S.: 
+(1) Data Structure is a good thing, i'm only trying to avoid a deep delay in starting projects.
+(2) MongoDB is good but also we consider changing it to RethinkDB.
+
+# Installing (Docker)
+
+> Pull it from docker hub:
+
+`docker-compose up --build`
+
+> Or build it yourself:
+
+`docker pull tegila/mongoio`
+
+# Browser Trickies
+
+Google Chrome don't allow calls to localhost with invalid certificate.
+Circunvent this by enabling the following flag:
+
+chrome://flags/#allow-insecure-localhost
+
+# Installing (Old way)
 
 > The command below it is going to generate a file containing an RSA key.
 
@@ -35,9 +62,13 @@ O mongoDB tem atendido as necessidades do sistema, mas está sendo avaliada uma 
 
 [Reference](https://medium.com/@dai_shi/tail-call-optimization-tco-in-node-v6-e2492c9d5b7c)
 
-# Using
-
 # Testing 
-chrome://flags/#allow-insecure-localhost
+
+Use the test.js inside the server/ and check if everything installed fine.
+It will also give you an idea about how it works.
 
 # FAQ
+
+> Why not use GraphQL?
+
+It don't fit well with JS as all the objects are self-declared and don't need redundant code for doing simple CRUD operations.
