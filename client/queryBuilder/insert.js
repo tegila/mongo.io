@@ -3,7 +3,7 @@ const Insert = () => ({
   insertMany: (data) => {
     console.log('insertMany');
     payload = Object.assign({}, payload, { insertMany: data });
-    return Insert(data);
+    return Insert();
   },
   payload: () => {
     console.log('payload', payload);
