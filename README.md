@@ -19,15 +19,21 @@ During this research we consider using the Firebase from Google and still using 
 
 On the backend we have the good old MongoDB and all the ecosystem that come with it.
 
-The most important part of this research was about not over complexify the application using *previous declarations of data objects*, *complex connection setup* and *low learning curve projects like GraphQL*.
+The most important part of this research was about not over complexify the application using **previous declarations of data objects**, **complex connection setup** and **low learning curve projects like GraphQL**.
 
 So now we can use the database without caring too much about data structure. 
 
 P.S.: 
-(1) Data Structure is a good thing, i'm only trying to avoid a deep delay in starting projects.
-(2) MongoDB is good but also we consider changing it to RethinkDB.
+1. Data Structure is a good thing, I'm only trying to avoid a deep delay in starting projects.
+2. MongoDB is good but we are also looking into changing it to RethinkDB.
 
-# Installing (Docker)
+# Axioms:
+
+1. No object pre-definition. (No config at all)
+2. Auth & ACL straightforward (DSA).
+3. CRUD chainnable code (Java Style)
+
+# Installing (Docker way)
 
 > Pull it from docker hub:
 
@@ -37,12 +43,29 @@ P.S.:
 
 `docker pull tegila/mongoio`
 
-# Browser Trickies
+# Browser Trickies:
 
-Google Chrome don't allow calls to localhost with invalid certificate.
+Google Chrome don't allow calls to localhost with self-signed (aka. development) certificate.
 Circunvent this by enabling the following flag:
 
 chrome://flags/#allow-insecure-localhost
+
+# Using it:
+
+```javascript
+import { queryBuilder, wss } from 'mongo.io';
+
+// Pagination 
+const query = queryBuilder("database/students")
+ .find({ age: { $lt: 18 } })
+  .sort({ age: -1 })
+  .skip(10)
+  .limit(100);
+  
+wss.send(query, (students) => {
+ console.log(students);
+});
+```
 
 # Installing (Old way)
 
@@ -71,4 +94,5 @@ It will also give you an idea about how it works.
 
 > Why not use GraphQL?
 
-It don't fit well with JS as all the objects are self-declared and don't need redundant code for doing simple CRUD operations.
+1. It don't fit well with JS as all the objects are self-declared and don't need redundant code for doing simple CRUD operations.
+2. I feel it's still very beta software and without environment infrastructure as the old good ones. MySQL is perfect at this point but it still need object pre-declaration.
