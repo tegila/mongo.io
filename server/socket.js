@@ -20,7 +20,7 @@ export const __execute__ = (data, callback) => {
 
 export const enable = (options, port) => {
   const server = https.createServer(options);
-  const io = socketio(server, { origins:'*:*' });
+  const io = socketio(server);
   server.listen(port);
   console.log(`listening socket.io on port ${port}`);
 
