@@ -2,7 +2,7 @@ const qb = require('./queryBuilder');
 const Store = require('./index');
 
 store = Store('http://localhost');
-store.connect('Kz4JQuFiq7gXvbBLKGdtqhRG9JS56gtScriE4vviCnRzHTVCkrxw');
+store.connect('FKRz1v/vlFL3Y65LLxIZlxJTc4zD5jPUWLGzqC7BQZgTnxjkoGxPB6tLfi0KXU1u5q+zycqqBSjMhKSBUfvgWw==');
 
 store.on('connect', (session) => {
   console.log('connected');

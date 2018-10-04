@@ -3,16 +3,16 @@ const insert = require('./insert');
 const remove = require('./remove');
 const update = require('./update');
 
-let load = {
-  transaction: {
-    payload: {}
-  }
-};
-
 function queryBuilder(collection) {
+  this.load = {
+    transaction: {
+      collection,
+      payload: {}
+    }
+  };
+
   if (this instanceof queryBuilder) {
     console.log('instanceOf QueryBuilder');
-    load.transaction = { collection };
     return this;
   } else {
     console.log('new QueryBuilder');
@@ -27,7 +27,6 @@ function queryBuilder(collection) {
   };
   
   queryBuilder.prototype.select = () => {
-    load.transaction.payload = find();
     return find();
   };
 
