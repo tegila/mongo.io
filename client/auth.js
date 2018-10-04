@@ -3,9 +3,6 @@ const util = require('tweetnacl-util');
 const querystring = require('querystring');
 const utils = require('./utils');
 
-console.log('TYPEOF UTILS', typeof utils.str2ab(new Date().toString()));
-
-
 const enc = util.encodeBase64;
 const dec = util.decodeBase64;
 
