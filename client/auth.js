@@ -3,6 +3,9 @@ const util = require('tweetnacl-util');
 const querystring = require('querystring');
 const utils = require('./utils');
 
+console.log('TYPEOF UTILS', typeof util);
+
+
 const enc = util.encodeBase64;
 const dec = util.decodeBase64;
 
@@ -27,6 +30,10 @@ const self = module.exports = {
   },
   authenticate: (secretKey) => {      
     self.init_keychain(secretKey);
+
+    const message = new Date().toString();
+    const signature = nacl.sign.detached(utils.str2ab(message), keypair.secretKey);
+
     const auth = {
       pubkey: enc(keypair.publicKey),
       message: self.sign_message(
