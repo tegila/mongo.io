@@ -6,6 +6,7 @@ const auth = require('./auth');
 const utils = require('./utils');
 const nacl = require('tweetnacl');
 const util = require('tweetnacl-util');
+const enc = util.encodeBase64;
 
 let io = null;
 
