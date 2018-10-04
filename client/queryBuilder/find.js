@@ -1,37 +1,37 @@
 let payload = {};
 const Find = (query) => ({
-  find: (query) => {
+  find: (find) => {
     console.log('find');
-    payload = Object.assign({}, payload, { action: 'find', payload:query });
+    payload = Object.assign({}, payload, { find });
     return Find(query);
   },
-  findOne: (query) => {
+  findOne: (findOne) => {
     console.log('findOne');
-    payload = Object.assign({}, payload, { action: 'findOne', payload:query });
+    payload = Object.assign({}, payload, { findOne });
     return Find(query);
   },
-  sort: (query) => {
+  sort: (sort) => {
     console.log('sort');
-    payload = Object.assign({}, payload, { action: 'sort', payload:query });
+    payload = Object.assign({}, payload, { sort });
     return Find(query);
   },
-  order: (query) => {
+  order: (order) => {
     console.log('order');
-    payload = Object.assign({}, payload, { action: 'order', payload:query });
+    payload = Object.assign({}, payload, { order });
     return Find(query);
   },
-  limit: (query) => {
+  limit: (limit) => {
     console.log('limit');
-    payload = Object.assign({}, payload, { action: 'limit', payload:query });
+    payload = Object.assign({}, payload, { limit });
     return Find(query);
   },
-  skip: (query) => {
+  skip: (skip) => {
     console.log('skip');
-    payload = Object.assign({}, payload, { action: 'skip', payload:query });
+    payload = Object.assign({}, payload, { skip });
     return Find(query);
   },
   payload: () => {
-    return payload;
+    return JSON.stringify(payload);
   }
 });
 
