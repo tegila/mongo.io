@@ -2,6 +2,7 @@
 
 const socket = require('socket.io-client');
 const querystring = require('querystring');
+const authenticate = require('./auth');
 
 let io = null;
 
