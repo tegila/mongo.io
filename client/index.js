@@ -3,6 +3,7 @@
 const socket = require('socket.io-client');
 const querystring = require('querystring');
 const auth = require('./auth');
+const utils = require('./utils');
 const nacl = require('tweetnacl');
 const util = require('tweetnacl-util');
 
@@ -35,7 +36,7 @@ module.exports = (url) => {
     },
     findOne: (path, payload) => {
       return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
+        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
         io.once(signature, (data) => {
           const _local = Object.assign({}, data);
@@ -55,7 +56,7 @@ module.exports = (url) => {
       __parse_regex__(payload);
       console.log(payload);
       return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
+        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
         io.once(signature, (data) => {
           const _local = Object.assign({}, data);
@@ -73,7 +74,7 @@ module.exports = (url) => {
     },
     remove: (path, payload) => {
       return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
+        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
         io.once(signature, (data) => {
           console.log("[index.js] ONCE DELETE");
@@ -90,7 +91,7 @@ module.exports = (url) => {
     },
     save: (path, payload) => {
       return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
+        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
         console.log('[index.js] save', path, signature);
         io.once(signature, (data) => {
@@ -108,7 +109,7 @@ module.exports = (url) => {
     },
     update: (path, payload) => {
       return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
+        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
         console.log('[index.js] update', path, signature);
         io.once(signature, (data) => {
