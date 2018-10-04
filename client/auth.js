@@ -9,6 +9,9 @@ const dec = util.decodeBase64;
 let keypair = {};
 
 const self = module.exports = {
+  get_secretKey: () => {
+    return keypair.secretKey
+  },
   generate_key: () => {
     keypair = nacl.sign.keyPair();
     return keypair.secretKey;

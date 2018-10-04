@@ -23,7 +23,7 @@ module.exports = (url) => {
     },
     connect: (secretKey) => {
       const auth_enc = auth.authenticate(secretKey); 
-      console.log('AUTH_ENC', auth_enc);
+      console.log('AUTH_ENC', auth.get_secretKey());
            
       // https://localhost/socket.io?query={signature=...&pubkey=...&message=...}
       io = socket.connect(url, { rejectUnauthorized: false, reconnect: true, query: auth_enc });
