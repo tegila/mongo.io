@@ -3,7 +3,7 @@ const util = require('tweetnacl-util');
 const querystring = require('querystring');
 const utils = require('./utils');
 
-console.log('TYPEOF UTILS', typeof util);
+console.log('TYPEOF UTILS', typeof utils);
 
 
 const enc = util.encodeBase64;
