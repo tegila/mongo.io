@@ -1,12 +1,14 @@
 const qb = require('./queryBuilder');
+const Store = require('./index');
 
-const load = qb("app/test")
-  .select()
-  .find({valor: 1})
-  .sort({id: -1})
-  .skip(10)
-  .limit(100)
-  .payload();
+store = Store('http://localhost');
+store.connect('Kz4JQuFiq7gXvbBLKGdtqhRG9JS56gtScriE4vviCnRzHTVCkrxw');
 
-  console.log('load', load);
-  
+store.on('connect', (session) => {
+  console.log('connected');
+  store.me().then(console.log);
+
+  store.on('test/session', (session) => {
+    console.log("GLOBAL [test.js] store.on: ", session);
+  });
+});
