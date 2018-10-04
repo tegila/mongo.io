@@ -8,7 +8,7 @@ const dec = util.decodeBase64;
 
 let keypair = {};
 
-module.exports = () => ({
+const self = module.exports = {
   generate_key: () => {
     keypair = nacl.sign.keyPair();
     return keypair.secretKey;
@@ -20,16 +20,16 @@ module.exports = () => ({
   },
   init_keychain: (secretKey) => {
     if(secretKey) {
-      from_secretKey(secretKey);
+      self.from_secretKey(secretKey);
     } else {
-      generate_key();
+      self.generate_key();
     }
   },
-  authenticate: (secretKey) => {
-    init_keychain(secretKey);
+  authenticate: (secretKey) => {      
+    self.init_keychain(secretKey);
     const auth = {
       pubkey: enc(keypair.publicKey),
-      message: sign_message(
+      message: self.sign_message(
         enc(new Date())
       ),
       signature: enc(signature)
@@ -51,9 +51,9 @@ module.exports = () => ({
   },
   sign_transaction: (transaction) => {
     return enc(
-      sign_message(
-        hash_message(transaction)
+      self.sign_message(
+        self.hash_message(transaction)
       )
     );
   },
-});
+};

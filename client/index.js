@@ -2,7 +2,7 @@
 
 const socket = require('socket.io-client');
 const querystring = require('querystring');
-const authenticate = require('./auth');
+const auth = require('./auth');
 
 let io = null;
 
@@ -18,7 +18,9 @@ module.exports = (url) => {
       });
     },
     connect: (secretKey) => {
-      const auth_enc = authenticate(secretKey);
+      const auth_enc = auth.authenticate(secretKey);
+      console.log('auth_enc: ', auth_enc);
+      
       // https://localhost/socket.io?query={signature=...&pubkey=...&message=...}
       io = socket.connect(url, { rejectUnauthorized: false, reconnect: true, query: auth_enc });
     },
