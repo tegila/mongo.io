@@ -30,7 +30,7 @@ const self = module.exports = {
     const auth = {
       pubkey: enc(keypair.publicKey),
       message: self.sign_message(
-        enc(new Date())
+        enc(new Date().toString())
       ),
       signature: enc(signature)
     };
