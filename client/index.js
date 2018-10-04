@@ -3,6 +3,8 @@
 const socket = require('socket.io-client');
 const querystring = require('querystring');
 const auth = require('./auth');
+const nacl = require('tweetnacl');
+const util = require('tweetnacl-util');
 
 let io = null;
 
