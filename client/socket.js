@@ -7,7 +7,8 @@ module.exports = () => ({
   /* https://localhost/socket.io?query={signature=...&pubkey=...&message=...} */
   connect: (url, secretKey) => {
     const auth_enc = authenticate(secretKey);
-    io = socket.connect(url, { rejectUnauthorized: false, reconnect: true, query: auth_enc });
+    /** https://stackoverflow.com/questions/33906921/socket-io-not-disconnecting-xhr-polling-400-bad-request */
+    io = socket.connect(url, { rejectUnauthorized: false, transports: [ "flashsocket","polling","websocket" ], reconnect: true, query: auth_enc });
   },
   whoami: () => {
     return new Promise((resolve) => {

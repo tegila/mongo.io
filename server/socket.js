@@ -49,6 +49,8 @@ export const enable = (options, port) => {
       
     });
   });
+  /** https://stackoverflow.com/questions/33906921/socket-io-not-disconnecting-xhr-polling-400-bad-request */
+  io.set('transports', [ 'websocket', 'flashsocket', 'polling' ] );
 
   // AUTHENTICATION LOGIC
   io.use((socket, next) => {
