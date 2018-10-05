@@ -30,6 +30,13 @@ const Find = (query) => ({
     payload = Object.assign({}, payload, { [field]: { $lt: value } });
     return Find(query);
   },
+  lte: (obj) => {
+    console.log('lte');
+    const field = Object.keys(obj)[0];
+    const value = Object.values(obj)[0];
+    payload = Object.assign({}, payload, { [field]: { $lte: value } });
+    return Find(query);
+  },
   in: (obj) => {
     console.log('in');
     const field = Object.keys(obj)[0];
