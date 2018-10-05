@@ -12,6 +12,13 @@ const Update = () => ({
     }
     return Update();
   },
+  increment: (obj) => {
+    console.log('increment');
+    const field = Object.keys(obj)[0];
+    const value = Object.values(obj)[0];
+    payload = Object.assign({}, payload, { $inc: { [field]: value } });
+    return Update();
+  },
   updateOne: (operator, data) => {
     console.log('updateOne');
     payload = Object.assign({}, payload, { operator: operator, updateOne: data });
