@@ -23,6 +23,13 @@ const Find = (query) => ({
     payload = Object.assign({}, payload, { [field]: { $gte: value } });
     return Find(query);
   },
+  in: (obj) => {
+    console.log('in');
+    const field = Object.keys(obj)[0];
+    const value = Object.values(obj)[0];
+    payload = Object.assign({}, payload, { [field]: { $in: value } });
+    return Find(query);
+  },
   sort: (sort) => {
     console.log('sort');
     const field = Object.keys(sort)[0];
