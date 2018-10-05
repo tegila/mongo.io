@@ -54,7 +54,7 @@ module.exports = (url) => {
       });
     },
     query: (path, payload) => {
-      __parse_regex__(payload);
+      utils.__parse_regex__(payload);
       console.log(payload);
       return new Promise((resolve, reject) => {
         const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
