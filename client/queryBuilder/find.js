@@ -3,9 +3,9 @@ let payload = {};
 const Find = (query) => ({
   sort: (sort) => {
     console.log('sort');
-    const key = Object.keys(sort)[0];
+    const field = Object.keys(sort)[0];
     const value = Object.values(sort)[0];
-    payload = Object.assign({}, payload, { $sort:{ [key]: value } });
+    payload = Object.assign({}, payload, { $sort:{ [field]: value } });
     return Find(query);
   },
   limit: (number) => {
