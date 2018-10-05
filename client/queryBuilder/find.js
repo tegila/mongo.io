@@ -3,17 +3,24 @@ let payload = {};
 const Find = (query) => ({
   /** Query Selectors - Comparison */
   eq: (obj) => {
-    console.log('obj');
+    console.log('eq');
     const field = Object.keys(obj)[0];
     const value = Object.values(obj)[0];
     payload = Object.assign({}, payload, { [field]: { $eq: value } });
     return Find(query);
   },
   gt: (obj) => {
-    console.log('obj');
+    console.log('gt');
     const field = Object.keys(obj)[0];
     const value = Object.values(obj)[0];
     payload = Object.assign({}, payload, { [field]: { $gt: value } });
+    return Find(query);
+  },
+  gte: (obj) => {
+    console.log('gte');
+    const field = Object.keys(obj)[0];
+    const value = Object.values(obj)[0];
+    payload = Object.assign({}, payload, { [field]: { $gte: value } });
     return Find(query);
   },
   sort: (sort) => {
