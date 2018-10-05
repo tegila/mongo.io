@@ -44,6 +44,13 @@ const Find = (query) => ({
     payload = Object.assign({}, payload, { [field]: { $ne: value } });
     return Find(query);
   },
+  nin: (obj) => {
+    console.log('nin');
+    const field = Object.keys(obj)[0];
+    const value = Object.values(obj)[0];
+    payload = Object.assign({}, payload, { [field]: { $nin: value } });
+    return Find(query);
+  },
   in: (obj) => {
     console.log('in');
     const field = Object.keys(obj)[0];
