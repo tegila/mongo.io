@@ -1,6 +1,14 @@
 let payload = {};
 
 const Find = (query) => ({
+  /** Query Selectors - Comparison */
+  eq: (obj) => {
+    console.log('obj');
+    const field = Object.keys(obj)[0];
+    const value = Object.values(obj)[0];
+    payload = Object.assign({}, payload, { [field]: { $eq: value } });
+    return Find(query);
+  },
   sort: (sort) => {
     console.log('sort');
     const field = Object.keys(sort)[0];
@@ -18,7 +26,7 @@ const Find = (query) => ({
     payload = Object.assign({}, payload, { $skip: number });
     return Find(query);
   },
-  payload: () => {
+  toJSON: () => {
     return JSON.stringify(payload);
   }
 });
