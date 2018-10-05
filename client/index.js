@@ -1,7 +1,6 @@
 /* eslint-disable */
 
 const socket = require('socket.io-client');
-const querystring = require('querystring');
 const auth = require('./auth');
 const utils = require('./utils');
 const nacl = require('tweetnacl');
