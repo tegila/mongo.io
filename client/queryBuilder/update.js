@@ -1,5 +1,17 @@
 let payload = {};
+
 const Update = () => ({
+  currentDate: (value) => {
+    console.log('currentDate');
+    if (typeof value === 'boolean' && value) {
+      payload = Object.assign({}, payload, { $currentDate: value });
+    } else {
+      payload = Object.assign({}, payload, {
+        $currentDate: { $type: value.toLowerCase() }
+      });
+    }
+    return Update();
+  },
   updateOne: (operator, data) => {
     console.log('updateOne');
     payload = Object.assign({}, payload, { operator: operator, updateOne: data });
@@ -15,8 +27,7 @@ const Update = () => ({
     payload = Object.assign({}, payload, { operator: operator, replaceOne: data });
     return Update();
   },
-  payload: () => {
-    console.log('payload', payload);
+  toJSON: () => {
     return payload;
   }
 });
