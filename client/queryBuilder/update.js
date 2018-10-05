@@ -33,6 +33,11 @@ const Update = () => ({
     payload = Object.assign({}, payload, { $max: { [field]: value } });
     return Update();
   },
+  multiplay: (field, value) => {
+    console.log('multiplay');
+    payload = Object.assign({}, payload, { $mu: { [field]: value } });
+    return Update();
+  },
   toJSON: () => {
     return payload;
   }
