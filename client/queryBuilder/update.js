@@ -12,24 +12,18 @@ const Update = () => ({
     }
     return Update();
   },
-  increment: (obj) => {
+  increment: (field, value) => {
     console.log('increment');
-    const field = Object.keys(obj)[0];
-    const value = Object.values(obj)[0];
     payload = Object.assign({}, payload, { $inc: { [field]: value } });
     return Update();
   },
-  min: (obj) => {
+  min: (field, value) => {
     console.log('min');
-    const field = Object.keys(obj)[0];
-    const value = Object.values(obj)[0];
     payload = Object.assign({}, payload, { $min: { [field]: value } });
     return Update();
   },
-  max: (obj) => {
+  max: (field, value) => {
     console.log('min');
-    const field = Object.keys(obj)[0];
-    const value = Object.values(obj)[0];
     payload = Object.assign({}, payload, { $max: { [field]: value } });
     return Update();
   },
