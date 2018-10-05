@@ -1,6 +1,7 @@
 let payload = {};
 
 const Update = () => ({
+  /** Field Update Operators */
   currentDate: (value) => {
     console.log('currentDate');
     if (typeof value === 'boolean' && value) {
@@ -52,6 +53,7 @@ const Update = () => ({
     payload = Object.assign({}, payload, { $unset: { [field]: '' } });
     return Update();
   },
+  /** Array Update Operators */
   toJSON: () => {
     return JSON.stringify(payload);
   }
