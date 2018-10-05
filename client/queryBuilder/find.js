@@ -75,6 +75,14 @@ const Find = (query) => ({
     payload = Object.assign({}, payload, { $skip: number });
     return Find(query);
   },
+  /** Logical Query Operators */
+  not: (obj) => {
+    console.log('not');
+    const field = Object.keys(obj)[0];
+    const value = Object.values(obj)[0];
+    payload = Object.assign({}, payload, { $not:{ [field]: value } });
+    return Find(query);
+  },
   toJSON: () => {
     return JSON.stringify(payload);
   }
