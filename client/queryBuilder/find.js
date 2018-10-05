@@ -12,7 +12,9 @@ const Find = (query) => ({
   },
   sort: (sort) => {
     console.log('sort');
-    payload = Object.assign({}, payload, { $sort:{ sort } });
+    const key = Object.keys(sort)[0];
+    const value = Object.values(sort)[0];
+    payload = Object.assign({}, payload, { $sort:{ [key]: value } });
     return Find(query);
   },
   order: (order) => {
@@ -25,9 +27,9 @@ const Find = (query) => ({
     payload = Object.assign({}, payload, { limit });
     return Find(query);
   },
-  skip: (skip) => {
+  skip: (number) => {
     console.log('skip');
-    payload = Object.assign({}, payload, { skip });
+    payload = Object.assign({}, payload, { $skip: number });
     return Find(query);
   },
   payload: () => {
