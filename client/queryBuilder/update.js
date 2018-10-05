@@ -54,6 +54,11 @@ const Update = () => ({
     return Update();
   },
   /** Array Update Operators */
+  addToSet: (field, value) => {
+    console.log('addToSet');
+    payload = Object.assign({}, payload, { $addToSet: { [field]: value } });
+    return Update();
+  },
   toJSON: () => {
     return JSON.stringify(payload);
   }
