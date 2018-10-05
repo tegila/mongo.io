@@ -1,15 +1,6 @@
 let payload = {};
+
 const Find = (query) => ({
-  find: (find) => {
-    console.log('find');
-    payload = Object.assign({}, payload, { find });
-    return Find(query);
-  },
-  findOne: (findOne) => {
-    console.log('findOne');
-    payload = Object.assign({}, payload, { findOne });
-    return Find(query);
-  },
   sort: (sort) => {
     console.log('sort');
     const key = Object.keys(sort)[0];
@@ -17,14 +8,9 @@ const Find = (query) => ({
     payload = Object.assign({}, payload, { $sort:{ [key]: value } });
     return Find(query);
   },
-  order: (order) => {
-    console.log('order');
-    payload = Object.assign({}, payload, { order });
-    return Find(query);
-  },
-  limit: (limit) => {
+  limit: (number) => {
     console.log('limit');
-    payload = Object.assign({}, payload, { limit });
+    payload = Object.assign({}, payload, { $limit: number });
     return Find(query);
   },
   skip: (number) => {
