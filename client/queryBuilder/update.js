@@ -47,6 +47,11 @@ const Update = () => ({
     payload = Object.assign({}, payload, { $setOnInsert: { [field]: value } }, { upsert: true });
     return Update();
   },
+  unset: (field) => {
+    console.log('unset');
+    payload = Object.assign({}, payload, { $unset: { [field]: '' } });
+    return Update();
+  },
   toJSON: () => {
     return JSON.stringify(payload);
   }
