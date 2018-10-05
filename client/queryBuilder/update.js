@@ -32,8 +32,18 @@ const Update = () => ({
     payload = Object.assign({}, payload, { $mu: { [field]: value } });
     return Update();
   },
+  rename: (field, value) => {
+    console.log('rename');
+    payload = Object.assign({}, payload, { $rename: { [field]: value } });
+    return Update();
+  },
+  set: (field, value) => {
+    console.log('set');
+    payload = Object.assign({}, payload, { $set: { [field]: value } });
+    return Update();
+  },
   toJSON: () => {
-    return payload;
+    return JSON.stringify(payload);
   }
 });
 
