@@ -66,6 +66,13 @@ const Update = () => ({
     payload = Object.assign({}, payload, { $pop: { [field]: value } });
     return Update();
   },
+  pull: (obj) => {
+    console.log('pull');
+    const field = Object.keys(obj).shift();
+    const value = Object.values(obj).shift();
+    payload = Object.assign({}, payload, { $pull: { [field]: value } });
+    return Update();
+  },
   toJSON: () => {
     return JSON.stringify(payload);
   }
