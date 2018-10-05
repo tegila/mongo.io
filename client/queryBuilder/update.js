@@ -26,6 +26,13 @@ const Update = () => ({
     payload = Object.assign({}, payload, { $min: { [field]: value } });
     return Update();
   },
+  max: (obj) => {
+    console.log('min');
+    const field = Object.keys(obj)[0];
+    const value = Object.values(obj)[0];
+    payload = Object.assign({}, payload, { $max: { [field]: value } });
+    return Update();
+  },
   toJSON: () => {
     return payload;
   }
