@@ -12,7 +12,7 @@ const Find = (query) => ({
   },
   sort: (sort) => {
     console.log('sort');
-    payload = Object.assign({}, payload, { sort });
+    payload = Object.assign({}, payload, { $sort:{ sort } });
     return Find(query);
   },
   order: (order) => {
