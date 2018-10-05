@@ -19,6 +19,13 @@ const Update = () => ({
     payload = Object.assign({}, payload, { $inc: { [field]: value } });
     return Update();
   },
+  min: (obj) => {
+    console.log('min');
+    const field = Object.keys(obj)[0];
+    const value = Object.values(obj)[0];
+    payload = Object.assign({}, payload, { $min: { [field]: value } });
+    return Update();
+  },
   toJSON: () => {
     return payload;
   }
