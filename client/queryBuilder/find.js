@@ -1,5 +1,13 @@
 let payload = {};
 
+const payload_stringfy = (payload) => {
+  return JSON.stringify(payload);
+}
+
+const payload_parse = (payload) => {
+  return JSON.parse(payload);
+}
+
 const Find = (query) => ({
   /** Query Selectors - Comparison */
   eq: (obj) => {
