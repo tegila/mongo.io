@@ -2,8 +2,7 @@ const qb = require('./queryBuilder');
 
 const query = qb("app/test")
   .select()
-  .not({ 'title':'/^Kit/' })
-  .eq({ status: 'active' })
+  .nin('qty', [25, 100])
   .toJSON();
   
 console.log('obj', JSON.parse(query));
