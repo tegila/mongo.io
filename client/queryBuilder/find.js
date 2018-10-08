@@ -66,7 +66,7 @@ const Find = (query) => ({
     console.log('not');
     const field = Object.keys(obj)[0];
     const value = Object.values(obj)[0];
-    payload = Object.assign({}, payload, { $not:{ [field]: value } });
+    payload = Object.assign({}, payload, { [field]: { $regex: value } });
     return Find(query);
   },
   /**
