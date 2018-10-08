@@ -35,24 +35,6 @@ module.exports = (url) => {
     once: (topic, callback) => {
       io.once(topic, callback);
     },
-    find: (path, payload) => {
-      return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
-        const signature = enc(nacl.sign.detached(payload_hash, auth.get_secretKey()));
-        io.once(signature, (data) => {
-          const _local = Object.assign({}, data);
-          console.log("[index.js] ONCE find", _local);
-          if (_local.err) reject(_local.err);
-          if (_local.res) resolve(_local.res);
-        });
-        io.emit('link', {
-          action: "find",
-          path,
-          payload,
-          signature
-        });
-      });
-    },
     findOne: (path, payload) => {
       return new Promise((resolve, reject) => {
         const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
