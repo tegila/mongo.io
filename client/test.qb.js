@@ -2,7 +2,8 @@ const qb = require('./queryBuilder');
 
 const query = qb("app/test")
   .select()
-  .not('sold_quantity', { $gt: 5 })
+  .eq('status', 'active')
+  .not('title', { $eq: '/^Kit/' })
   .toJSON();
   
 console.log('obj', JSON.parse(query));
