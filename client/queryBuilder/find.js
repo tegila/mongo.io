@@ -62,11 +62,9 @@ const Find = (query) => ({
    * Logical Query Operators
    * See {@link https://docs.mongodb.com/manual/reference/operator/query-logical/}
    */
-  not: (obj) => {
+  not: (field, value) => {
     console.log('not');
-    const field = Object.keys(obj)[0];
-    const value = Object.values(obj)[0];
-    payload = Object.assign({}, payload, { [field]: { $regex: value } });
+    payload = Object.assign({}, payload, { [field]: { $not: value } });
     return Find(query);
   },
   /**
