@@ -35,13 +35,11 @@ const self = module.exports = {
     const signature = nacl.sign.detached(utils.str2ab(message), keypair.secretKey);
 
     const auth = {
+      signature: enc(signature),
       pubkey: enc(keypair.publicKey),
-      message: self.sign_message(
-        enc(new Date().toString())
-      ),
-      signature: enc(signature)
+      message
     };
-    return querystring.stringify(auth)
+    return querystring.stringify(auth);
   },
   sign_message: (message) => {
     return nacl.sign.detached(
