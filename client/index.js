@@ -1,7 +1,12 @@
 /* eslint-disable */
 
+const utils = require('./utils');
+const auth = require('./auth');
+const nacl = require('tweetnacl');
 const socket = require('socket.io-client');
-const querystring = require('querystring');
+const util = require('tweetnacl-util');
+
+const enc = util.encodeBase64;
 
 let io = null;
 
@@ -17,7 +22,7 @@ module.exports = (url) => {
       });
     },
     connect: (secretKey) => {
-      const auth_enc = authenticate(secretKey);
+      const auth_enc = auth.authenticate(secretKey);
       // https://localhost/socket.io?query={signature=...&pubkey=...&message=...}
       io = socket.connect(url, { rejectUnauthorized: false, reconnect: true, query: auth_enc });
     },
@@ -32,8 +37,8 @@ module.exports = (url) => {
     },
     findOne: (path, payload) => {
       return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
-        const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
+        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
+        const signature = enc(nacl.sign.detached(payload_hash, auth.get_secretKey()));
         io.once(signature, (data) => {
           const _local = Object.assign({}, data);
           console.log("[index.js] ONCE findOne", _local);
@@ -49,11 +54,11 @@ module.exports = (url) => {
       });
     },
     query: (path, payload) => {
-      __parse_regex__(payload);
+      utils.__parse_regex__(payload);
       console.log(payload);
       return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
-        const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
+        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
+        const signature = enc(nacl.sign.detached(payload_hash, auth.get_secretKey()));
         io.once(signature, (data) => {
           const _local = Object.assign({}, data);
           // console.log("[index.js] ONCE QUERY", _local);
@@ -70,8 +75,8 @@ module.exports = (url) => {
     },
     remove: (path, payload) => {
       return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
-        const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
+        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
+        const signature = enc(nacl.sign.detached(payload_hash, auth.get_secretKey()));
         io.once(signature, (data) => {
           console.log("[index.js] ONCE DELETE");
           if (data.err) reject(data.err);
@@ -87,8 +92,8 @@ module.exports = (url) => {
     },
     save: (path, payload) => {
       return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
-        const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
+        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
+        const signature = enc(nacl.sign.detached(payload_hash, auth.get_secretKey()));
         console.log('[index.js] save', path, signature);
         io.once(signature, (data) => {
           console.log("[index.js] ONCE SAVE");
@@ -105,8 +110,8 @@ module.exports = (url) => {
     },
     update: (path, payload) => {
       return new Promise((resolve, reject) => {
-        const payload_hash = nacl.hash(str2ab(JSON.stringify(payload)));
-        const signature = enc(nacl.sign.detached(payload_hash, keypair.secretKey));
+        const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
+        const signature = enc(nacl.sign.detached(payload_hash, auth.get_secretKey()));
         console.log('[index.js] update', path, signature);
         io.once(signature, (data) => {
           console.log("[index.js] ONCE UPDATE");
