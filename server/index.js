@@ -9,14 +9,10 @@ require('babel-register')({
 const socket = require('./socket');
 const mongo = require('./mongo');
 
-const options = {
-  key: fs.readFileSync(path.resolve(__dirname, './cert.pem')),
-  cert: fs.readFileSync(path.resolve(__dirname, './cert.crt'))
-};
 const port = process.argv[3] || 3000;
 
 const url = `mongodb://mongo:27017/`
 
 mongo.enable(url, () => {
-  socket.enable(options, port);
+  socket.enable(port);
 });

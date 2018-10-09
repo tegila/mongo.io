@@ -1,4 +1,4 @@
-const https = require('https');
+const http = require('http');
 const socketio = require('socket.io');
 
 const auth = require('./auth');
@@ -18,8 +18,8 @@ export const __execute__ = (data, callback) => {
   }
 }
 
-export const enable = (options, port) => {
-  const server = https.createServer(options);
+export const enable = (port) => {
+  const server = http.createServer();
   const io = socketio(server);
   server.listen(port);
   console.log(`listening socket.io on port ${port}`);
