@@ -1,10 +1,11 @@
 /* eslint-disable */
 
-const socket = require('socket.io-client');
-const auth = require('./auth');
 const utils = require('./utils');
+const auth = require('./auth');
 const nacl = require('tweetnacl');
+const socket = require('socket.io-client');
 const util = require('tweetnacl-util');
+
 const enc = util.encodeBase64;
 
 let io = null;
