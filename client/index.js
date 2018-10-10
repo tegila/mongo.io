@@ -55,7 +55,7 @@ module.exports = (url) => {
     },
     query: (path, payload) => {
       utils.__parse_regex__(payload);
-      console.log(payload);
+      console.log('[ INDEX - QUERY PAYLOAD ]',payload);
       return new Promise((resolve, reject) => {
         const payload_hash = nacl.hash(utils.str2ab(JSON.stringify(payload)));
         const signature = enc(nacl.sign.detached(payload_hash, auth.get_secretKey()));
