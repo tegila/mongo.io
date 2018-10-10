@@ -36,12 +36,14 @@ export const __fix_id__ = (obj) => {
   if(obj._id) obj._id = new ObjectID(obj._id) 
 };
 
+/** See {@link https://docs.mongodb.com/manual/reference/method/cursor.hint/#hint-collection-scans } */
 export const findOne = (coll, payload, callback) => {
-  coll.findOne(payload, {sort: {$natural: -1}}, callback);
+  coll.findOne(payload, callback);
 }
 
+/** See {@link https://docs.mongodb.com/manual/reference/method/cursor.hint/#hint-collection-scans } */
 export const query = (coll, payload, callback) => {
-  coll.find(payload).toArray(callback);
+  coll.find(payload).hint( { $natural : -1 } ).toArray(callback);
 }
 
 export const remove = (coll, payload, callback) => {
