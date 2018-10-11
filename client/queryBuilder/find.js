@@ -18,7 +18,7 @@ const Find = (query) => ({
    */
   eq: (field, value) => {
     console.log('eq');
-    payload = Object.assign({}, payload, { [field]: { $eq: value } });
+    payload = Object.assign({}, payload, { [field]: value });
     return Find(query);
   },
   gt: (field, value) => {
