@@ -4,6 +4,6 @@ const query = qb("app/test")
   .select()
   .not('title', /^Kit/)
   .eq('status', 'active')
-  .toJSON();
+  .getPayload();
   
 console.log('obj', query);

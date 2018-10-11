@@ -70,7 +70,7 @@ const Find = (query) => ({
   /**
    * @returns JSON
    */
-  toJSON: () => {
+  getPayload: () => {
     return payload;
   },
 });
