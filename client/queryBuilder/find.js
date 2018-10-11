@@ -64,14 +64,14 @@ const Find = (query) => ({
    */
   not: (field, value) => {
     console.log('not');
-    payload = Object.assign({}, payload, { [field]: { $not: RegExp(value) } });
+    payload = Object.assign({}, payload, { [field]: { $not: /^Kit/ } });
     return Find(query);
   },
   /**
    * @returns JSON
    */
   toJSON: () => {
-    return JSON.stringify(payload);
+    return payload;
   },
 });
 
