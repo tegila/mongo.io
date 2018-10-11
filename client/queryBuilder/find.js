@@ -64,7 +64,7 @@ const Find = (query) => ({
    */
   not: (field, value) => {
     console.log('not');
-    payload = Object.assign({}, payload, { [field]: { $not: value } });
+    payload = Object.assign({}, payload, { [field]: { $not: RegExp(value) } });
     return Find(query);
   },
   /**
