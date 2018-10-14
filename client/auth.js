@@ -28,19 +28,6 @@ const self = module.exports = {
       self.generate_key();
     }
   },
-  authenticate: (secretKey) => {      
-    self.init_keychain(secretKey);
-
-    const message = new Date().toString();
-    const signature = nacl.sign.detached(utils.str2ab(message), keypair.secretKey);
-
-    const auth = {
-      signature: enc(signature),
-      pubkey: enc(keypair.publicKey),
-      message
-    };
-    return querystring.stringify(auth);
-  },
   sign_message: (message) => {
     return nacl.sign.detached(
       utils.str2ab(message), 
@@ -54,11 +41,33 @@ const self = module.exports = {
       )
     )
   },
+  sign_message_hash: (message) => {
+    return self.sign_message(
+      self.hash_message(message)
+    );
+  },
   sign_transaction: (transaction) => {
     return enc(
       self.sign_message(
         self.hash_message(transaction)
       )
     );
+  },
+  auth_from_secretKey: (secretKey) => {      
+    self.init_keychain(secretKey);
+
+    // const message = new Date().toString();
+    // const signature = nacl.sign.detached(utils.str2ab(message), keypair.secretKey);
+    
+    const message = sign_message_hash(
+      new Date().toString()
+    );
+
+    const auth = {
+      signature: enc(signature),
+      pubkey: enc(keypair.publicKey),
+      message
+    };
+    return querystring.stringify(auth);
   },
 };
