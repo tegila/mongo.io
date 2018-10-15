@@ -59,7 +59,7 @@ const self = module.exports = {
     // const message = new Date().toString();
     // const signature = nacl.sign.detached(utils.str2ab(message), keypair.secretKey);
     
-    const message = sign_message_hash(
+    const message = self.sign_message_hash(
       new Date().toString()
     );
 
