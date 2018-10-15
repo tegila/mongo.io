@@ -1,7 +1,7 @@
 const qb = require('./queryBuilder');
 
-const query = qb("app/test")
-  .select()
+const query = qb()
+  .select('app/test')
   .not('title', /^Kit/)
   .eq('status', 'active')
   .getPayload();

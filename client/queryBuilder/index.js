@@ -18,8 +18,8 @@ function queryBuilder() {
     return remove();
   };
   
-  queryBuilder.prototype.select = () => {
-    return find();
+  queryBuilder.prototype.select = (collection) => {
+    return find(collection);
   };
 
   queryBuilder.prototype.insert = () => {

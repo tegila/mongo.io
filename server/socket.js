@@ -10,11 +10,11 @@ export const __execute__ = (data, callback) => {
 
   if (actions.indexOf(data.action) > -1) {
     console.log(data.action);
-    const [dbname, collection] = data.path.split("/");
+    const [dbname, collection] = data.collection.split("/");
     const coll = mongo.select_collection(dbname, collection);
     mongo.__fix_id__(data.payload);
     mongo.__parse_date__(data.payload);
-    return mongo[data.action](coll, data.payload, callback);
+    return mongo[data.action](coll, data.payload.payload, callback);
   }
 }
 
@@ -41,7 +41,7 @@ export const enable = (port) => {
           const broadcast = Object.assign({}, data, { err, res });
           // broadcast to all connected clients
           // TODO: (fix to specific channel)
-          io.sockets.emit(data.path, broadcast);
+          io.sockets.emit(data.payload.collection, broadcast);
           // emit to specific client
           socket.emit(data.signature, { err, res }); 
         });
