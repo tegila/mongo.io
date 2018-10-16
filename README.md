@@ -37,11 +37,11 @@ P.S.:
 
 > Pull it from docker hub:
 
-`docker-compose up --build`
+`docker pull tegila/mongoio`
 
 > Or build it yourself:
 
-`docker pull tegila/mongoio`
+`docker-compose up --build -d`
 
 # Browser Trickies:
 
