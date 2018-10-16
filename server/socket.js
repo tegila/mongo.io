@@ -28,9 +28,9 @@ export const enable = (port) => {
     console.log('[server.js] new connection');
     
     // ------------ ME() --------------
-    socket.on('me', function () {
+    socket.on('whoami', function () {
       console.log('[server.js] me function');
-      socket.emit('me', socket.__auth__);
+      socket.emit('whoami', socket.__auth__);
     });
     
     // ------------ LINK() --------------
@@ -50,18 +50,27 @@ export const enable = (port) => {
     });
   });
   /** https://stackoverflow.com/questions/33906921/socket-io-not-disconnecting-xhr-polling-400-bad-request */
-  io.set('transports', [ 'websocket', 'flashsocket', 'polling' ] );
+  io.set('transports', [
+    'websocket',
+    'flashsocket',
+    'polling'
+  ]);
 
   // AUTHENTICATION LOGIC
   io.use((socket, next) => {
     const q = socket.handshake.query;
     const message = q.message;
 
-    if (!auth.__check_signature__(message, q.signature, q.pubkey)) 
+    if (!auth.__check_signature__(message, q.signature, q.pubkey)) {
+      console.log('[ERROR]: Check Signature');
       return next(false);
-
+    }
     auth.__profile__(q.pubkey, (err, profile) => {
-      if (err) return next(err);
+      if (err) {
+        console.log('[ERROR]: User not found');
+        return next(err);
+      }
+      console.log(`User found: ${profile.user}`);
       socket.__auth__ = profile;
       return next();
     })
