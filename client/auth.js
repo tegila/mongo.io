@@ -16,7 +16,7 @@ const Auth = (secretKey) => {
     get_secretKey: () => keypair.secretKey,
     sign_message: (message) => {
       return nacl.sign.detached(
-        utils.str2ab(message), 
+        message,
         keypair.secretKey
       );
     },
