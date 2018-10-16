@@ -1,8 +1,8 @@
 // redux store - persistence layer
 const Store = require('../client/index');
 
-store = Store("http://localhost");
-store.connect("Kz4JQuFiq7gXvbBLKGdtqhRG9JS56gtScriE4vviCnRzHTVCkrxw");
+store = Store("https://localhost:3000");
+store.connect("42EvDFt4KTG84dblNQ+Kgj8bv0H4T0+vWMJ0DXTFzLRFM4I06+/eoeOL8J1MbEwUD9Dm4KORNr5QBZDDhlp0ZQ==");
 
 store.on('connect', (session) => {
   console.log('connected');

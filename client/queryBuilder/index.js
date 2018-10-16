@@ -3,31 +3,26 @@ const insert = require('./insert');
 const remove = require('./remove');
 const update = require('./update');
 
-function queryBuilder() {
+const queryBuilder = (target) => {
+  const [db, collection] = target.split("/");
+  const transaction = {
+    db,
+    collection,
+    payload: {}
+  };
 
-  if (this instanceof queryBuilder) {
-    console.log('instanceOf QueryBuilder');
-    return this;
-  } else {
-    console.log('new QueryBuilder');
-    return new queryBuilder();
+  return {
+    remove: (order) => {
+
+    },  
+    find: (query) => find({
+      ...transaction,
+      payload: {
+        type: 'query',
+        query: query || {}
+      }
+    })
   }
 };
-
-  queryBuilder.prototype.remove = () => {
-    return remove();
-  };
-  
-  queryBuilder.prototype.select = (collection) => {
-    return find(collection);
-  };
-
-  queryBuilder.prototype.insert = () => {
-    return insert();
-  };
-
-  queryBuilder.prototype.update = () => {
-    return update();
-  }
 
 module.exports = queryBuilder;

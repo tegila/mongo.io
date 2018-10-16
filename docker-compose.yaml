@@ -9,10 +9,11 @@ services:
     environment:
       MONGO_INITDB_DATABASE: "__auth__"
   mongoio:
+    image: mongoio:latest
     build: .
     ports:
-    - "3000:3000"
-    #volumes:
-    #- .:/usr/src/app
+      - "3000:3000"
     links:
-    - mongo
+      - mongo
+    depends_on:
+      - mongo
