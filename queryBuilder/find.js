@@ -14,51 +14,39 @@ const Find = (transaction) => ({
   },
   gt: (field, value) => {
     console.log('gt');
-    transaction.payload = Object.assign({}, transaction.payload, { [field]: { $gt: value } });
+    Object.assign(transaction.payload.query, { [field]: { $gt: value }});
     return Find(transaction);
   },
   gte: (field, value) => {
     console.log('gte');
-    payload = Object.assign({}, payload, {
-      payload: Object.assign({}, payload.payload, { [field]: { $gte: value } }),
-    });
+    Object.assign(transaction.payload.query, { [field]: { $gte: value }});
     return Find(transaction);
   },
   in: (field, value) => {
     console.log('in');
     if (typeof value !== 'object') throw '$in needs an array';
-    payload = Object.assign({}, payload, {
-      payload: Object.assign({}, payload.payload, { [field]: { $in: value } }),
-    });
+    Object.assign(transaction.payload.query, { [field]: { $in: value }});
     return Find(transaction);
   },
   lt: (field, value) => {
     console.log('lt');
-    payload = Object.assign({}, payload, {
-      payload: Object.assign({}, payload.payload, { [field]: { $lt: value } }),
-    });
+    Object.assign(transaction.payload.query, { [field]: { $lt: value }});
     return Find(transaction);
   },
   lte: (field, value) => {
     console.log('lte');
-    payload = Object.assign({}, payload, {
-      payload: Object.assign({}, payload.payload, { [field]: { $lte: value } }),
-    });
+    Object.assign(transaction.payload.query, { [field]: { $lte: value }});
     return Find(transaction);
   },
   ne: (field, value) => {
     console.log('ne');
-    payload = Object.assign({}, payload, {
-      payload: Object.assign({}, payload.payload, { [field]: { $ne: value } }),
-    });
+    Object.assign(transaction.payload.query, { [field]: { $ne: value }});
     return Find(transaction);
   },
   nin: (field, value) => {
     console.log('nin');
     if (typeof value !== 'object') throw '$nin needs an array';
-    payload = Object.assign({}, payload, {
-      payload: Object.assign({}, payload.payload, { [field]: { $nin: value } }),
-    });
+    Object.assign(transaction.payload.query, { [field]: { $nin: value }});
     return Find(transaction);
   },
   /**
