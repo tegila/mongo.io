@@ -1,4 +1,4 @@
-const qb = require('../client/queryBuilder');
+const qb = require('../queryBuilder');
 const wss = require('../client/wss');
 
 const payload = qb('app/test').find()

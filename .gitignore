@@ -53,3 +53,4 @@ Thumbs.db
 .settings
 
 yarn*
+package-lock.json

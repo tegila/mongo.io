@@ -17,8 +17,8 @@ const queryBuilder = (target) => {
     },  
     find: (query) => find({
       ...transaction,
-      payload: {
-        type: 'query',
+      type: 'query',
+      payload: {        
         query: query || {}
       }
     })
