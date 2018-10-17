@@ -12,7 +12,11 @@ const transport = wss(
 );
 
 transport.whoami()
-  .then((data) => console.log(data))
-  .catch((err) => console.error(err));
-  
+  .then((data) => console.log('whaomi', data))
+  .catch((err) => console.error('whaomi', err));
+
+transport.send(payload)
+  .then((data) => console.log('send', data))
+  .catch((err) => console.error('send', err));
+
 console.dir(payload);
