@@ -10,6 +10,7 @@
   "author": "Edson Tégila Gonçalves",
   "license": "PRIVATE",
   "dependencies": {
+    "mocha": "^5.2.0",
     "querystring": "^0.2.0",
     "socket.io-client": "^2.1.0",
     "tweetnacl": "0.13.1",
