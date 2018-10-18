@@ -1,19 +1,20 @@
 const nacl = require('tweetnacl');
 const util = require('tweetnacl-util');
-const querystring = require('querystring');
 const utils = require('./utils');
 
 const enc = util.encodeBase64;
 const dec = util.decodeBase64;
 
-const Auth = (secretKey) => {
-  const keypair = secretKey ? 
-    nacl.sign.keyPair.fromSecretKey(
-      dec(secretKey)
-    ) : nacl.sign.keyPair();
-  
-  return self = {
+const Auth = () => {
+  const keypair = null;
+  return {
     get_secretKey: () => keypair.secretKey,
+    init_keypair: (secretKey) => {
+      keypair = secretKey ? 
+        nacl.sign.keyPair.fromSecretKey(
+          dec(secretKey)
+        ) : nacl.sign.keyPair();
+    },
     sign_message: (message) => {
       return nacl.sign.detached(
         message,
@@ -34,21 +35,16 @@ const Auth = (secretKey) => {
     },
     sign_transaction: (transaction) => {
       return enc(
-        self.sign_message(
-          self.hash_message(transaction)
-        )
+        self.sign_message_hash(transaction)
       );
     },
-    auth_string: () => {      
-      const message = new Date().toString();
-      const signature = self.sign_message_hash(message);
-
-      return querystring.stringify({
-        message,
-        signature: enc(signature),
-        pubkey: enc(keypair.publicKey),
-      });
-    },
+    check_signature: (message, signature, pubkey) => {    
+      return nacl.sign.detached.verify(
+        self.hash_message(message),
+        dec(signature),
+        dec(pubkey)
+      );
+    }
   }
 };
 
