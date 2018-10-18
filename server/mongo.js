@@ -28,6 +28,7 @@ export const __parse_date__ = (obj) => {
   }
 }
 
+
 export const select_collection = (dbname, collection) => {
   return db.db(dbname).collection(collection);
 }
@@ -64,4 +65,9 @@ export const update = (coll, payload, callback) => {
   coll.update(target, { '$set': new_values }, ops, (err, status) => {
     callback(err, { status, res: new_values });
   });
+}
+
+export const __profile__ = (pubkey, callback) => {
+  const coll = select_collection("__auth__", "Profiles");
+  return findOne(coll, { pubkeys: pubkey }, callback);
 }
